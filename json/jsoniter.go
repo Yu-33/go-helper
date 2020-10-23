@@ -1,3 +1,8 @@
+//+build !jsonstd
+// Copyright 2017 Bo-Yi Wu.  All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file.
+
 package json
 
 import (
@@ -16,12 +21,4 @@ var (
 	NewDecoder = compatible.NewDecoder
 	// NewEncoder is exported by gin/json package.
 	NewEncoder = compatible.NewEncoder
-)
-
-var (
-	_ = Marshal
-	_ = Unmarshal
-	_ = MarshalIndent
-	_ = NewDecoder
-	_ = NewEncoder
 )
