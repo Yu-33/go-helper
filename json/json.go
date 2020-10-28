@@ -18,5 +18,3 @@ var (
 	// NewEncoder is exported by gin/json package.
 	NewEncoder = json.NewEncoder
 )
-
-

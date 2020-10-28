@@ -132,7 +132,6 @@ func TestDAG_DelVertex(t *testing.T) {
 	}
 }
 
-
 func TestDAG_DelEdge(t *testing.T) {
 	g := New()
 	vertexes := []container.Int64{0, 1, 2, 3, 4, 5, 6, 7, 8}

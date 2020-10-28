@@ -145,7 +145,7 @@ func (g *DAG) DelEdge(vertex, adjacency Vertex) bool {
 	if v := vex.out.Delete(adj); v == nil {
 		return false
 	}
-	if v :=  adj.in.Delete(vex); v == nil {
+	if v := adj.in.Delete(vex); v == nil {
 		return false
 	}
 
@@ -155,4 +155,3 @@ func (g *DAG) DelEdge(vertex, adjacency Vertex) bool {
 func (g *DAG) IterTopo() *IteratorTopo {
 	return newIteratorTopo(g)
 }
-
