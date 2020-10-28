@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/Yu-33/helper/datastructs/container"
+	"github.com/Yu-33/gohelper/datastructs/container"
 )
 
 type Elements = container.Comparer

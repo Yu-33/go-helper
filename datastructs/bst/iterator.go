@@ -3,7 +3,7 @@ package bst
 import (
 	"reflect"
 
-	"github.com/Yu-33/helper/datastructs/stack"
+	"github.com/Yu-33/gohelper/datastructs/stack"
 )
 
 type Iterator struct {

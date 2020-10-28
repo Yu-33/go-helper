@@ -1,4 +1,4 @@
-module github.com/Yu-33/helper
+module github.com/Yu-33/gohelper
 
 go 1.14
 

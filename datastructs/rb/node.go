@@ -1,8 +1,8 @@
 package rb
 
 import (
-	"github.com/Yu-33/helper/datastructs/bst"
-	"github.com/Yu-33/helper/datastructs/container"
+	"github.com/Yu-33/gohelper/datastructs/bst"
+	"github.com/Yu-33/gohelper/datastructs/container"
 )
 
 type Elements = container.Comparer

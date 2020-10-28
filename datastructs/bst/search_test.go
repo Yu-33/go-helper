@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Yu-33/helper/datastructs/container"
+	"github.com/Yu-33/gohelper/datastructs/container"
 )
 
 func searchRangeByRecursion(root *MockNode, start Elements, boundary Elements) []Elements {
