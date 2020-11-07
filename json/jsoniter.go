@@ -10,15 +10,15 @@ import (
 )
 
 var (
-	compatible = jsoniter.ConfigCompatibleWithStandardLibrary
+	json = jsoniter.ConfigCompatibleWithStandardLibrary
 	// Marshal is exported by gin/json package.
-	Marshal = compatible.Marshal
+	Marshal = json.Marshal
 	// Unmarshal is exported by gin/json package.
-	Unmarshal = compatible.Unmarshal
+	Unmarshal = json.Unmarshal
 	// MarshalIndent is exported by gin/json package.
-	MarshalIndent = compatible.MarshalIndent
+	MarshalIndent = json.MarshalIndent
 	// NewDecoder is exported by gin/json package.
-	NewDecoder = compatible.NewDecoder
+	NewDecoder = json.NewDecoder
 	// NewEncoder is exported by gin/json package.
-	NewEncoder = compatible.NewEncoder
+	NewEncoder = json.NewEncoder
 )
