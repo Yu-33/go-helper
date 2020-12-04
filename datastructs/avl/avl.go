@@ -9,7 +9,7 @@ import (
 
 type Element = container.Comparer
 
-// Node used in avl tree and implements bst.Node
+// Node used in avl tree and implements bst.Node.
 type Node struct {
 	element Element
 	left    *Node
@@ -82,8 +82,8 @@ func (tr *Tree) Delete(elements Element) Element {
 	return d.element
 }
 
-// Iter return a Iterator, include elements: start <= k <= boundary
-// start == first node if start == nil and boundary == last node if boundary == nil
+// Iter return a Iterator, include elements: start <= k <= boundary.
+// start == first node if start == nil and boundary == last node if boundary == nil.
 func (tr *Tree) Iter(start Element, boundary Element) container.Iterator {
 	it := bst.NewIterator(tr.root, start, boundary)
 	return it
@@ -116,7 +116,7 @@ func (tr *Tree) insert(root *Node, elements Element) (*Node, *Node) {
 	return root, n
 }
 
-// return (new root, delete node)
+// return (new root, delete node).
 func (tr *Tree) delete(root *Node, element Element) (*Node, *Node) {
 	var d *Node
 	if root == nil {

@@ -49,7 +49,7 @@ func (s *Stack) Empty() bool {
 	return s.len == 0
 }
 
-// Push add elements to the end of stack
+// Push add element to the end of stack
 func (s *Stack) Push(item interface{}) {
 	if s.cap == s.len {
 		s.grow(s.cap << 1)

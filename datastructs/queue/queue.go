@@ -30,13 +30,13 @@ func New(c int) *Queue {
 	return q
 }
 
-func (q *Queue) grow(n int) {
-	if n > q.cap-1 {
+func (q *Queue) grow(c int) {
+	if c > q.cap-1 {
 		oldCap := q.cap
 		oldLen := q.cap - 1
 		items := q.items
 
-		q.cap = n + 1
+		q.cap = c + 1
 		q.items = make([]interface{}, q.cap)
 		for i := 0; i < oldLen; i++ {
 			q.items[i] = items[(i+q.front)%oldCap]
@@ -61,7 +61,7 @@ func (q *Queue) Empty() bool {
 	return q.Len() == 0
 }
 
-// Push add elements to the end of queue
+// Push add element to the end of queue
 func (q *Queue) Push(item interface{}) {
 	if q.Len() == q.Cap() {
 		q.grow((q.cap - 1) * 2)
