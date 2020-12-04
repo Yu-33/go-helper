@@ -1,4 +1,4 @@
-package pqueue
+package maxheap
 
 import (
 	"github.com/Yu-33/gohelper/datastructs/container"

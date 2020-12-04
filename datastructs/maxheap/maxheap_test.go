@@ -1,4 +1,4 @@
-package pqueue
+package maxheap
 
 import (
 	"fmt"

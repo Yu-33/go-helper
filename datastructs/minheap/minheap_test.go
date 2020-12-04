@@ -1,4 +1,4 @@
-package pqueue
+package minheap
 
 import (
 	"fmt"

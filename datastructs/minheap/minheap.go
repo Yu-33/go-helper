@@ -1,4 +1,4 @@
-package pqueue
+package minheap
 
 import (
 	"github.com/Yu-33/gohelper/datastructs/container"
