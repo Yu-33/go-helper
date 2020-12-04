@@ -17,7 +17,7 @@ func output(sl *List) {
 		fmt.Printf("Level <%d, %d> | ", i, sl.lens[i])
 		p := sl.head.next[i]
 		for p != nil {
-			fmt.Printf("%d -> ", p.elements)
+			fmt.Printf("%d -> ", p.element)
 			p = p.next[i]
 		}
 		fmt.Printf("\n")
@@ -29,7 +29,7 @@ func checkCorrect(t *testing.T, sl *List) {
 	for i := 0; i <= sl.level; i++ {
 		p := sl.head.next[i]
 		for p != nil && p.next[i] != nil {
-			require.Equal(t, p.elements.Compare(p.next[i].elements), -1)
+			require.Equal(t, p.element.Compare(p.next[i].element), -1)
 			p = p.next[i]
 		}
 	}
@@ -139,31 +139,31 @@ func TestList_Search(t *testing.T) {
 
 	node = sl.searchLastLT(container.Int64(25))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(24))
+	require.Equal(t, node.element, container.Int64(24))
 
 	node = sl.searchLastLT(container.Int64(77))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(67))
+	require.Equal(t, node.element, container.Int64(67))
 
 	node = sl.searchLastLT(container.Int64(132))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(130))
+	require.Equal(t, node.element, container.Int64(130))
 
 	node = sl.searchLastLT(container.Int64(133))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(130))
+	require.Equal(t, node.element, container.Int64(130))
 
 	node = sl.searchLastLT(container.Int64(146))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(145))
+	require.Equal(t, node.element, container.Int64(145))
 
 	node = sl.searchLastLT(container.Int64(150))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(145))
+	require.Equal(t, node.element, container.Int64(145))
 
 	node = sl.searchLastLT(container.Int64(156))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(150))
+	require.Equal(t, node.element, container.Int64(150))
 
 	// --------- [24, 61, 67, 84, 91, 130, 133, 145, 150] ---------
 	node = sl.searchLastLE(container.Int64(21))
@@ -171,56 +171,56 @@ func TestList_Search(t *testing.T) {
 
 	node = sl.searchLastLE(container.Int64(24))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(24))
+	require.Equal(t, node.element, container.Int64(24))
 
 	node = sl.searchLastLE(container.Int64(77))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(67))
+	require.Equal(t, node.element, container.Int64(67))
 
 	node = sl.searchLastLE(container.Int64(132))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(130))
+	require.Equal(t, node.element, container.Int64(130))
 
 	node = sl.searchLastLE(container.Int64(133))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(133))
+	require.Equal(t, node.element, container.Int64(133))
 
 	node = sl.searchLastLE(container.Int64(137))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(133))
+	require.Equal(t, node.element, container.Int64(133))
 
 	node = sl.searchLastLE(container.Int64(150))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(150))
+	require.Equal(t, node.element, container.Int64(150))
 
 	node = sl.searchLastLE(container.Int64(156))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(150))
+	require.Equal(t, node.element, container.Int64(150))
 
 	// --------- [24, 61, 67, 84, 91, 130, 133, 145, 150] ---------
 	node = sl.searchFirstGT(container.Int64(21))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(24))
+	require.Equal(t, node.element, container.Int64(24))
 
 	node = sl.searchFirstGT(container.Int64(24))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(61))
+	require.Equal(t, node.element, container.Int64(61))
 
 	node = sl.searchFirstGT(container.Int64(25))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(61))
+	require.Equal(t, node.element, container.Int64(61))
 
 	node = sl.searchFirstGT(container.Int64(77))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(84))
+	require.Equal(t, node.element, container.Int64(84))
 
 	node = sl.searchFirstGT(container.Int64(132))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(133))
+	require.Equal(t, node.element, container.Int64(133))
 
 	node = sl.searchFirstGT(container.Int64(133))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(145))
+	require.Equal(t, node.element, container.Int64(145))
 
 	node = sl.searchFirstGT(container.Int64(150))
 	require.Nil(t, node)
@@ -230,35 +230,35 @@ func TestList_Search(t *testing.T) {
 	// --------- [24, 61, 67, 84, 91, 130, 133, 145, 150] ---------
 	node = sl.searchFirstGE(container.Int64(21))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(24))
+	require.Equal(t, node.element, container.Int64(24))
 
 	node = sl.searchFirstGE(container.Int64(24))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(24))
+	require.Equal(t, node.element, container.Int64(24))
 
 	node = sl.searchFirstGE(container.Int64(25))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(61))
+	require.Equal(t, node.element, container.Int64(61))
 
 	node = sl.searchFirstGE(container.Int64(77))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(84))
+	require.Equal(t, node.element, container.Int64(84))
 
 	node = sl.searchFirstGE(container.Int64(132))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(133))
+	require.Equal(t, node.element, container.Int64(133))
 
 	node = sl.searchFirstGE(container.Int64(133))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(133))
+	require.Equal(t, node.element, container.Int64(133))
 
 	node = sl.searchFirstGE(container.Int64(146))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(150))
+	require.Equal(t, node.element, container.Int64(150))
 
 	node = sl.searchFirstGE(container.Int64(150))
 	require.NotNil(t, node)
-	require.Equal(t, node.elements, container.Int64(150))
+	require.Equal(t, node.element, container.Int64(150))
 
 	node = sl.searchFirstGE(container.Int64(151))
 	require.Nil(t, node)

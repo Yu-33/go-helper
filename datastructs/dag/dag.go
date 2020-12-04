@@ -110,7 +110,7 @@ func (g *DAG) AddEdge(vertex, adjacency Vertex) bool {
 	s := stack.New(-1)
 	s.Push(adj)
 
-	for !s.IsEmpty() {
+	for !s.Empty() {
 		n := s.Pop().(*node)
 		if n.Compare(vex) == 0 {
 			return false
@@ -152,6 +152,6 @@ func (g *DAG) DelEdge(vertex, adjacency Vertex) bool {
 	return true
 }
 
-func (g *DAG) IterTopo() *IteratorTopo {
-	return newIteratorTopo(g)
+func (g *DAG) IterTopo() *IterTopo {
+	return newIterTopo(g)
 }

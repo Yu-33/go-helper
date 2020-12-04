@@ -7,6 +7,28 @@ import (
 	"github.com/Yu-33/gohelper/datastructs/container"
 )
 
+type Element = container.Comparer
+
+// Node used in avl tree and implements bst.Node
+type Node struct {
+	element Element
+	left    *Node
+	right   *Node
+	height  int
+}
+
+func (n *Node) Element() Element {
+	return n.element
+}
+
+func (n *Node) Left() bst.Node {
+	return n.left
+}
+
+func (n *Node) Right() bst.Node {
+	return n.right
+}
+
 type Tree struct {
 	root *Node
 	len  int
@@ -24,22 +46,22 @@ func (tr *Tree) Len() int {
 	return tr.len
 }
 
-func (tr *Tree) Search(elements Elements) Elements {
+func (tr *Tree) Search(elements Element) Element {
 	p := tr.root
 	for p != nil {
-		flag := elements.Compare(p.elements)
+		flag := elements.Compare(p.element)
 		if flag == -1 {
 			p = p.left
 		} else if flag == 1 {
 			p = p.right
 		} else {
-			return p.elements
+			return p.element
 		}
 	}
 	return nil
 }
 
-func (tr *Tree) Insert(elements Elements) bool {
+func (tr *Tree) Insert(elements Element) bool {
 	var n *Node
 	tr.root, n = tr.insert(tr.root, elements)
 	if n == nil {
@@ -49,7 +71,7 @@ func (tr *Tree) Insert(elements Elements) bool {
 	return true
 }
 
-func (tr *Tree) Delete(elements Elements) Elements {
+func (tr *Tree) Delete(elements Element) Element {
 	var d *Node
 	tr.root, d = tr.delete(tr.root, elements)
 	if d == nil {
@@ -57,25 +79,25 @@ func (tr *Tree) Delete(elements Elements) Elements {
 	}
 
 	tr.len--
-	return d.elements
+	return d.element
 }
 
 // Iter return a Iterator, include elements: start <= k <= boundary
 // start == first node if start == nil and boundary == last node if boundary == nil
-func (tr *Tree) Iter(start Elements, boundary Elements) container.Iterator {
+func (tr *Tree) Iter(start Element, boundary Element) container.Iterator {
 	it := bst.NewIterator(tr.root, start, boundary)
 	return it
 }
 
 // return (new root, new node)
-func (tr *Tree) insert(root *Node, elements Elements) (*Node, *Node) {
+func (tr *Tree) insert(root *Node, elements Element) (*Node, *Node) {
 	var n *Node
 
 	if root == nil {
 		n = tr.createNode(elements)
 		root = n
 	} else {
-		flag := elements.Compare(root.elements)
+		flag := elements.Compare(root.element)
 		if flag == -1 {
 			// insert into left subtree
 			root.left, n = tr.insert(root.left, elements)
@@ -95,19 +117,19 @@ func (tr *Tree) insert(root *Node, elements Elements) (*Node, *Node) {
 }
 
 // return (new root, delete node)
-func (tr *Tree) delete(root *Node, elements Elements) (*Node, *Node) {
+func (tr *Tree) delete(root *Node, element Element) (*Node, *Node) {
 	var d *Node
 	if root == nil {
 		// not found
 		return nil, nil
 	} else {
-		flag := elements.Compare(root.elements)
+		flag := element.Compare(root.element)
 		if flag == -1 {
 			// delete from left subtree
-			root.left, d = tr.delete(root.left, elements)
+			root.left, d = tr.delete(root.left, element)
 		} else if flag == 1 {
 			// delete from right subtree
-			root.right, d = tr.delete(root.right, elements)
+			root.right, d = tr.delete(root.right, element)
 		} else {
 			if root.left != nil && root.right != nil {
 				if tr.nodeHeight(root.left) > tr.nodeHeight(root.right) {
@@ -115,15 +137,15 @@ func (tr *Tree) delete(root *Node, elements Elements) (*Node, *Node) {
 					for x.right != nil {
 						x = x.right
 					}
-					root.elements, x.elements = x.elements, root.elements
-					root.left, d = tr.delete(root.left, elements)
+					root.element, x.element = x.element, root.element
+					root.left, d = tr.delete(root.left, element)
 				} else {
 					x := root.right
 					for x.left != nil {
 						x = x.left
 					}
-					root.elements, x.elements = x.elements, root.elements
-					root.right, d = tr.delete(root.right, elements)
+					root.element, x.element = x.element, root.element
+					root.right, d = tr.delete(root.right, element)
 				}
 			} else {
 				d = root
@@ -171,9 +193,9 @@ func (tr *Tree) reBalance(n *Node) *Node {
 	return n
 }
 
-func (tr *Tree) createNode(elements Elements) *Node {
+func (tr *Tree) createNode(element Element) *Node {
 	n := new(Node)
-	n.elements = elements
+	n.element = element
 	n.height = 1
 	n.left = nil
 	n.right = nil

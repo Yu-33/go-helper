@@ -8,11 +8,11 @@ import (
 
 type Iterator struct {
 	s        *stack.Stack
-	start    Elements
-	boundary Elements
+	start    Element
+	boundary Element
 }
 
-func NewIterator(root Node, start Elements, boundary Elements) *Iterator {
+func NewIterator(root Node, start Element, boundary Element) *Iterator {
 	s := stack.New(-1)
 
 	fillStack(root, start, boundary, s)
@@ -27,30 +27,30 @@ func NewIterator(root Node, start Elements, boundary Elements) *Iterator {
 }
 
 func (it *Iterator) Valid() bool {
-	return !it.s.IsEmpty()
+	return !it.s.Empty()
 }
 
-func (it *Iterator) Next() Elements {
-	if it.s.IsEmpty() {
+func (it *Iterator) Next() Element {
+	if it.s.Empty() {
 		return nil
 	}
 
 	p := it.s.Pop().(Node)
-	elements := p.Elements()
+	elements := p.Element()
 
 	fillStack(p.Right(), it.start, it.boundary, it.s)
 
 	return elements
 }
 
-func fillStack(root Node, start Elements, boundary Elements, s *stack.Stack) {
+func fillStack(root Node, start Element, boundary Element, s *stack.Stack) {
 	p := root
 	for !reflect.ValueOf(p).IsNil() {
-		if start != nil && p.Elements().Compare(start) == -1 {
+		if start != nil && p.Element().Compare(start) == -1 {
 			p = p.Right()
 			continue
 		}
-		if boundary != nil && p.Elements().Compare(boundary) == 1 {
+		if boundary != nil && p.Element().Compare(boundary) == 1 {
 			p = p.Left()
 			continue
 		}

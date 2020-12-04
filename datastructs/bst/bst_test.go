@@ -8,13 +8,13 @@ import (
 )
 
 type MockNode struct {
-	elements Elements
-	left     *MockNode
-	right    *MockNode
+	element Element
+	left    *MockNode
+	right   *MockNode
 }
 
-func (n *MockNode) Elements() Elements {
-	return n.elements
+func (n *MockNode) Element() Element {
+	return n.element
 }
 
 func (n *MockNode) Left() Node {
@@ -29,19 +29,19 @@ type MockTree struct {
 	root *MockNode
 }
 
-func (tr *MockTree) Insert(elements Elements) bool {
+func (tr *MockTree) Insert(elements Element) bool {
 	p := tr.root
 	for p != nil {
-		flag := elements.Compare(p.elements)
+		flag := elements.Compare(p.element)
 		if flag == -1 {
 			if p.left == nil {
-				p.left = &MockNode{elements: elements}
+				p.left = &MockNode{element: elements}
 				break
 			}
 			p = p.left
 		} else if flag == 1 {
 			if p.right == nil {
-				p.right = &MockNode{elements: elements}
+				p.right = &MockNode{element: elements}
 				break
 			}
 			p = p.right
@@ -51,7 +51,7 @@ func (tr *MockTree) Insert(elements Elements) bool {
 	}
 
 	if p == nil {
-		tr.root = &MockNode{elements: elements}
+		tr.root = &MockNode{element: elements}
 	}
 
 	return true

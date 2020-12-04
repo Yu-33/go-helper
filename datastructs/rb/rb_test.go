@@ -46,10 +46,10 @@ func checkBalance(t *testing.T, n *Node) {
 	}
 
 	if n.left != nil {
-		require.Equal(t, n.elements.Compare(n.left.elements), 1)
+		require.Equal(t, n.element.Compare(n.left.element), 1)
 	}
 	if n.right != nil {
-		require.Equal(t, n.elements.Compare(n.right.elements), -1)
+		require.Equal(t, n.element.Compare(n.right.element), -1)
 	}
 
 	lh := calculateNodeHeight(n.left)
@@ -74,7 +74,7 @@ func TestRBTree_createNode(t *testing.T) {
 	ele1 := container.Int64(1)
 	n1 := tr.createNode(ele1, nil)
 	require.NotNil(t, n1)
-	require.Equal(t, n1.elements, ele1)
+	require.Equal(t, n1.element, ele1)
 	require.Equal(t, n1.color, red)
 	require.Nil(t, n1.left)
 	require.Nil(t, n1.right)
@@ -83,7 +83,7 @@ func TestRBTree_createNode(t *testing.T) {
 	ele2 := container.Int64(2)
 	n2 := tr.createNode(ele2, n1)
 	require.NotNil(t, n2)
-	require.Equal(t, n2.elements, ele2)
+	require.Equal(t, n2.element, ele2)
 	require.Equal(t, n2.color, red)
 	require.Nil(t, n2.left)
 	require.Nil(t, n2.right)

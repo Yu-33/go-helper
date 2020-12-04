@@ -5,6 +5,34 @@ import (
 	"github.com/Yu-33/gohelper/datastructs/container"
 )
 
+const (
+	red int8 = iota
+	black
+)
+
+type Element = container.Comparer
+
+// Node used in rb tree and implements bst.Node
+type Node struct {
+	element Element
+	left    *Node
+	right   *Node
+	parent  *Node
+	color   int8
+}
+
+func (n *Node) Element() Element {
+	return n.element
+}
+
+func (n *Node) Left() bst.Node {
+	return n.left
+}
+
+func (n *Node) Right() bst.Node {
+	return n.right
+}
+
 type Tree struct {
 	root *Node
 	len  int
@@ -24,37 +52,37 @@ func (tr *Tree) Len() int {
 }
 
 // Search search elements in RB Tree, return nil if elements not exists
-func (tr *Tree) Search(elements Elements) Elements {
+func (tr *Tree) Search(element Element) Element {
 	p := tr.root
 	for p != nil {
-		flag := elements.Compare(p.elements)
+		flag := element.Compare(p.element)
 		if flag == -1 {
 			p = p.left
 		} else if flag == 1 {
 			p = p.right
 		} else {
-			return p.elements
+			return p.element
 		}
 	}
 	return nil
 }
 
 // Insert insert an elements into RB Tree, return false if have duplicate elements
-func (tr *Tree) Insert(elements Elements) bool {
+func (tr *Tree) Insert(element Element) bool {
 	var n *Node
 	p := tr.root
 	for p != nil {
-		flag := elements.Compare(p.elements)
+		flag := element.Compare(p.element)
 		if flag == -1 {
 			if p.left == nil {
-				n = tr.createNode(elements, p)
+				n = tr.createNode(element, p)
 				p.left = n
 				break
 			}
 			p = p.left
 		} else if flag == 1 {
 			if p.right == nil {
-				n = tr.createNode(elements, p)
+				n = tr.createNode(element, p)
 				p.right = n
 				break
 			}
@@ -64,7 +92,7 @@ func (tr *Tree) Insert(elements Elements) bool {
 		}
 	}
 	if n == nil {
-		n = tr.createNode(elements, p)
+		n = tr.createNode(element, p)
 	}
 
 	tr.insertBalance(n)
@@ -74,10 +102,10 @@ func (tr *Tree) Insert(elements Elements) bool {
 }
 
 // Delete delete an elements from RB Tree, return false if elements not exists
-func (tr *Tree) Delete(elements Elements) Elements {
+func (tr *Tree) Delete(element Element) Element {
 	d := tr.root
 	for d != nil {
-		flag := elements.Compare(d.elements)
+		flag := element.Compare(d.element)
 		if flag == -1 {
 			d = d.left
 		} else if flag == 1 {
@@ -96,7 +124,7 @@ func (tr *Tree) Delete(elements Elements) Elements {
 			x = x.right
 		}
 
-		d.elements, x.elements = x.elements, d.elements
+		d.element, x.element = x.element, d.element
 		d = x
 	}
 
@@ -125,12 +153,12 @@ func (tr *Tree) Delete(elements Elements) Elements {
 	}
 
 	tr.len--
-	return d.elements
+	return d.element
 }
 
 // Iter return a Iterator, include elements: start <= k <= boundary
 // start == first node if start == nil and boundary == last node if boundary == nil
-func (tr *Tree) Iter(start Elements, boundary Elements) container.Iterator {
+func (tr *Tree) Iter(start Element, boundary Element) container.Iterator {
 	it := bst.NewIterator(tr.root, start, boundary)
 	return it
 }
@@ -251,9 +279,9 @@ func (tr *Tree) deleteBalance(n *Node, p *Node) {
 	}
 }
 
-func (tr *Tree) createNode(elements Elements, p *Node) *Node {
+func (tr *Tree) createNode(element Element, p *Node) *Node {
 	n := new(Node)
-	n.elements = elements
+	n.element = element
 	n.color = red
 	n.left = nil
 	n.right = nil

@@ -6,38 +6,38 @@ import (
 	"github.com/Yu-33/gohelper/datastructs/stack"
 )
 
-func InOrder(node Node) []Elements {
+func InOrder(node Node) []Element {
 	if node == nil {
 		return nil
 	}
 
-	result := make([]Elements, 0)
+	result := make([]Element, 0)
 	s := stack.New(-1)
 	p := node
 
 	var i int
 
-	for !s.IsEmpty() || !reflect.ValueOf(p).IsNil() {
+	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
 		if !reflect.ValueOf(p).IsNil() {
 			s.Push(p)
 			p = p.Left()
 		} else {
 			p = s.Pop().(Node)
-			result = append(result, p.Elements())
+			result = append(result, p.Element())
 			p = p.Right()
 		}
 
 		i++
 	}
-	//for !s.IsEmpty() || !reflect.ValueOf(p).IsNil() {
+	//for !s.Empty() || !reflect.ValueOf(p).IsNil() {
 	//	for !reflect.ValueOf(p).IsNil() {
 	//		s.Push(p)
 	//		p = p.Left()
 	//	}
 	//
-	//	if !s.IsEmpty() {
+	//	if !s.Empty() {
 	//		p = s.Pop().(Node)
-	//		result = append(result, p.Elements())
+	//		result = append(result, p.Element())
 	//		p = p.Right()
 	//	}
 	//}
@@ -45,18 +45,18 @@ func InOrder(node Node) []Elements {
 	return result
 }
 
-func PreOrder(node Node) []Elements {
+func PreOrder(node Node) []Element {
 	if node == nil {
 		return nil
 	}
 
-	result := make([]Elements, 0)
+	result := make([]Element, 0)
 	s := stack.New(-1)
 	p := node
 
-	for !s.IsEmpty() || !reflect.ValueOf(p).IsNil() {
+	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
 		if !reflect.ValueOf(p).IsNil() {
-			result = append(result, p.Elements())
+			result = append(result, p.Element())
 			s.Push(p)
 			p = p.Left()
 		} else {
@@ -68,12 +68,12 @@ func PreOrder(node Node) []Elements {
 	return result
 }
 
-func PostOrder(node Node) []Elements {
+func PostOrder(node Node) []Element {
 	if node == nil {
 		return nil
 	}
 
-	result := make([]Elements, 0)
+	result := make([]Element, 0)
 
 	var lastVisit Node
 
@@ -85,10 +85,10 @@ func PostOrder(node Node) []Elements {
 		p = p.Left()
 	}
 
-	for !s.IsEmpty() {
+	for !s.Empty() {
 		p = s.Pop().(Node)
 		if reflect.ValueOf(p.Right()).IsNil() || p.Right() == lastVisit {
-			result = append(result, p.Elements())
+			result = append(result, p.Element())
 			lastVisit = p
 		} else {
 			s.Push(p)

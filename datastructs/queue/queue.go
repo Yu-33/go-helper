@@ -15,15 +15,15 @@ type Queue struct {
 
 // New return a new Queue Type, n is the initialization capacity;
 // We will use the defaultCapacity if n <= 0
-func New(n int) *Queue {
-	if n <= 0 {
-		n = defaultCapacity
+func New(c int) *Queue {
+	if c <= 0 {
+		c = defaultCapacity
 	}
 
-	n += 1
+	c += 1
 	q := &Queue{
-		items:  make([]interface{}, n),
-		cap:    n,
+		items:  make([]interface{}, c),
+		cap:    c,
 		front:  0,
 		behind: 0,
 	}
@@ -46,23 +46,23 @@ func (q *Queue) grow(n int) {
 	}
 }
 
-func (q *Queue) IsEmpty() bool {
-	return q.Len() == 0
-}
-
+// Len return the number of elements in the queue
 func (q *Queue) Len() int {
 	return (q.behind - q.front + q.cap) % q.cap
 }
 
+// Cap return the current capacity of the queue
 func (q *Queue) Cap() int {
 	return q.cap - 1
 }
 
-func (q *Queue) Grow(n int) {
-	q.grow(n)
+// Empty indicates whether the queue is empty
+func (q *Queue) Empty() bool {
+	return q.Len() == 0
 }
 
-func (q *Queue) Enqueue(item interface{}) {
+// Push add elements to the end of queue
+func (q *Queue) Push(item interface{}) {
 	if q.Len() == q.Cap() {
 		q.grow((q.cap - 1) * 2)
 	}
@@ -70,8 +70,9 @@ func (q *Queue) Enqueue(item interface{}) {
 	q.behind = (q.behind + 1) % q.cap
 }
 
-func (q *Queue) Dequeue() interface{} {
-	if q.IsEmpty() {
+// Pop returns and removes the element that at the head
+func (q *Queue) Pop() interface{} {
+	if q.Empty() {
 		return nil
 	}
 	item := q.items[q.front]
@@ -79,8 +80,9 @@ func (q *Queue) Dequeue() interface{} {
 	return item
 }
 
+// Peek returns the element that at the head
 func (q *Queue) Peek() interface{} {
-	if q.IsEmpty() {
+	if q.Empty() {
 		return nil
 	}
 	return q.items[q.front]

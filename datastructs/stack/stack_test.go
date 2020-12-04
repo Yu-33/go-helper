@@ -12,7 +12,7 @@ func TestStackNew(t *testing.T) {
 	st := New(capacity)
 	require.NotNil(t, st)
 	require.NotNil(t, st.items)
-	require.True(t, st.IsEmpty())
+	require.True(t, st.Empty())
 	require.Equal(t, st.Len(), 0)
 	require.Equal(t, len(st.items), capacity)
 	require.Equal(t, st.len, 0)
@@ -29,7 +29,7 @@ func TestStack1(t *testing.T) {
 			st.Push(i)
 		}
 		require.Equal(t, st.Len(), capacity)
-		require.False(t, st.IsEmpty())
+		require.False(t, st.Empty())
 		require.Equal(t, st.len, capacity)
 
 		// test pop and make stack empty
@@ -39,7 +39,7 @@ func TestStack1(t *testing.T) {
 			require.Equal(t, v, i)
 		}
 
-		require.True(t, st.IsEmpty())
+		require.True(t, st.Empty())
 		require.Equal(t, st.len, 0)
 
 		require.Nil(t, st.Pop())
@@ -68,12 +68,4 @@ func TestStack2(t *testing.T) {
 	require.Equal(t, st.Pop(), 3)
 	require.Equal(t, st.Pop(), 2)
 	require.Equal(t, st.Pop(), 1)
-}
-
-func TestStack_Grow(t *testing.T) {
-	capacity := 2
-	st := New(capacity)
-	require.Equal(t, st.Cap(), 2)
-	st.Grow(4)
-	require.Equal(t, st.Cap(), 4)
 }

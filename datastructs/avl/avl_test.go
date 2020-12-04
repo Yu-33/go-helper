@@ -35,10 +35,10 @@ func checkBalance(t *testing.T, tr *Tree, n *Node) {
 	require.Equal(t, tr.nodeHeight(n), recurseCalculateNodeHeight(n))
 
 	if n.left != nil {
-		require.Equal(t, n.elements.Compare(n.left.elements), 1)
+		require.Equal(t, n.element.Compare(n.left.element), 1)
 	}
 	if n.right != nil {
-		require.Equal(t, n.elements.Compare(n.right.elements), -1)
+		require.Equal(t, n.element.Compare(n.right.element), -1)
 	}
 
 	lh := tr.nodeHeight(n.left)
@@ -64,7 +64,7 @@ func TestAVLTree_createNode(t *testing.T) {
 
 	n1 := tr.createNode(el1)
 	require.NotNil(t, n1)
-	require.Equal(t, n1.elements.Compare(el1), 0)
+	require.Equal(t, n1.element.Compare(el1), 0)
 	require.Equal(t, n1.height, 1)
 	require.Nil(t, n1.left)
 	require.Nil(t, n1.right)

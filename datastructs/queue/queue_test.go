@@ -12,7 +12,7 @@ func TestQueueNew(t *testing.T) {
 	q := New(capacity)
 
 	require.NotNil(t, q)
-	require.True(t, q.IsEmpty())
+	require.True(t, q.Empty())
 	require.Equal(t, q.Len(), 0)
 	require.Equal(t, q.Cap(), capacity)
 
@@ -30,7 +30,7 @@ func TestQueue1(t *testing.T) {
 
 	// test enqueue and make length of queue equal of capacity
 	for i := 0; i < capacity; i++ {
-		q.Enqueue(i)
+		q.Push(i)
 	}
 
 	// queue already full
@@ -42,7 +42,7 @@ func TestQueue1(t *testing.T) {
 
 	// test dequeue and make queue empty
 	for i := 0; i < capacity; i++ {
-		item := q.Dequeue()
+		item := q.Pop()
 		require.NotNil(t, item)
 		require.Equal(t, item, i)
 	}
@@ -51,10 +51,10 @@ func TestQueue1(t *testing.T) {
 	require.Equal(t, q.front, capacity)
 	require.Equal(t, q.behind, capacity)
 
-	require.True(t, q.IsEmpty())
+	require.True(t, q.Empty())
 	require.Equal(t, q.Len(), 0)
 	require.Equal(t, q.Cap(), capacity)
-	require.Nil(t, q.Dequeue())
+	require.Nil(t, q.Pop())
 }
 
 func TestQueue2(t *testing.T) {
@@ -63,51 +63,42 @@ func TestQueue2(t *testing.T) {
 
 	p1 := unsafe.Pointer(&q.items[0])
 
-	q.Enqueue(1)
-	q.Enqueue(2)
+	q.Push(1)
+	q.Push(2)
 
 	p2 := unsafe.Pointer(&q.items[0])
 	require.Equal(t, p1, p2)
 
-	q.Enqueue(3)
+	q.Push(3)
 
 	p3 := unsafe.Pointer(&q.items[0])
 	require.NotEqual(t, p2, p3)
 
 	require.Equal(t, q.Cap(), capacity*2)
 
-	require.Equal(t, q.Dequeue(), 1)
-	require.Equal(t, q.Dequeue(), 2)
-	require.Equal(t, q.Dequeue(), 3)
+	require.Equal(t, q.Pop(), 1)
+	require.Equal(t, q.Pop(), 2)
+	require.Equal(t, q.Pop(), 3)
 }
 
 func TestQueue3(t *testing.T) {
 	capacity := 2
 	q := New(capacity)
 
-	q.Enqueue(1)
-	q.Enqueue(2)
-	require.Equal(t, q.Dequeue(), 1)
-	q.Enqueue(3)
+	q.Push(1)
+	q.Push(2)
+	require.Equal(t, q.Pop(), 1)
+	q.Push(3)
 
 	require.Greater(t, q.front, q.behind)
 
-	q.Enqueue(4)
-	q.Enqueue(5)
-	q.Enqueue(6)
+	q.Push(4)
+	q.Push(5)
+	q.Push(6)
 
-	require.Equal(t, q.Dequeue(), 2)
-	require.Equal(t, q.Dequeue(), 3)
-	require.Equal(t, q.Dequeue(), 4)
-	require.Equal(t, q.Dequeue(), 5)
-	require.Equal(t, q.Dequeue(), 6)
-}
-
-func TestQueue_Grow(t *testing.T) {
-	capacity := 2
-	q := New(capacity)
-
-	require.Equal(t, q.Cap(), 2)
-	q.Grow(4)
-	require.Equal(t, q.Cap(), 4)
+	require.Equal(t, q.Pop(), 2)
+	require.Equal(t, q.Pop(), 3)
+	require.Equal(t, q.Pop(), 4)
+	require.Equal(t, q.Pop(), 5)
+	require.Equal(t, q.Pop(), 6)
 }

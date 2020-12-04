@@ -4,13 +4,13 @@ import (
 	"github.com/Yu-33/gohelper/datastructs/queue"
 )
 
-// Iterator Topology
-type IteratorTopo struct {
+// IterTopo implements Iterator by Topology algo
+type IterTopo struct {
 	q         *queue.Queue
 	inDegrees map[*node]int
 }
 
-func newIteratorTopo(g *DAG) *IteratorTopo {
+func newIterTopo(g *DAG) *IterTopo {
 	q := queue.New(-1)
 
 	inDegrees := make(map[*node]int)
@@ -23,22 +23,22 @@ func newIteratorTopo(g *DAG) *IteratorTopo {
 
 	for n, degree := range inDegrees {
 		if degree == 0 {
-			q.Enqueue(n)
+			q.Push(n)
 		}
 	}
 
-	it := &IteratorTopo{
+	it := &IterTopo{
 		q:         q,
 		inDegrees: inDegrees,
 	}
 	return it
 }
 
-func (it *IteratorTopo) Valid() bool {
-	return !it.q.IsEmpty()
+func (it *IterTopo) Valid() bool {
+	return !it.q.Empty()
 }
 
-func (it *IteratorTopo) Next() []Vertex {
+func (it *IterTopo) Next() []Vertex {
 	if !it.Valid() {
 		return nil
 	}
@@ -46,8 +46,8 @@ func (it *IteratorTopo) Next() []Vertex {
 	vertexes := make([]Vertex, 0, it.q.Len())
 	nodes := make([]*node, 0, it.q.Len())
 
-	for !it.q.IsEmpty() {
-		n := it.q.Dequeue().(*node)
+	for !it.q.Empty() {
+		n := it.q.Pop().(*node)
 		vertexes = append(vertexes, n.vex)
 		nodes = append(nodes, n)
 	}
@@ -58,7 +58,7 @@ func (it *IteratorTopo) Next() []Vertex {
 			n := itOut.Next().(*node)
 			it.inDegrees[n]--
 			if it.inDegrees[n] == 0 {
-				it.q.Enqueue(n)
+				it.q.Push(n)
 			}
 		}
 	}

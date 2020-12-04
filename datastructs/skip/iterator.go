@@ -5,7 +5,7 @@ type Iterator struct {
 	end  *Node
 }
 
-func newIterator(sl *List, start Elements, boundary Elements) *Iterator {
+func newIterator(sl *List, start Element, boundary Element) *Iterator {
 	var node, end *Node
 
 	if !(start != nil && boundary != nil && start.Compare(boundary) == 1) {
@@ -35,12 +35,12 @@ func (iter *Iterator) Valid() bool {
 	return true
 }
 
-func (iter *Iterator) Next() Elements {
+func (iter *Iterator) Next() Element {
 	if !iter.Valid() {
 		return nil
 	}
 
-	elements := iter.node.elements
+	elements := iter.node.element
 	iter.node = iter.node.next[0]
 
 	return elements

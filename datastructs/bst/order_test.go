@@ -15,13 +15,13 @@ func TestInOrder(t *testing.T) {
 
 	var f func(node *MockNode)
 
-	r2 := make([]Elements, 0)
+	r2 := make([]Element, 0)
 	f = func(node *MockNode) {
 		if node == nil {
 			return
 		}
 		f(node.left)
-		r2 = append(r2, node.elements)
+		r2 = append(r2, node.element)
 		f(node.right)
 	}
 
@@ -39,12 +39,12 @@ func TestPreOrder(t *testing.T) {
 
 	var f func(node *MockNode)
 
-	r2 := make([]Elements, 0)
+	r2 := make([]Element, 0)
 	f = func(node *MockNode) {
 		if node == nil {
 			return
 		}
-		r2 = append(r2, node.elements)
+		r2 = append(r2, node.element)
 		f(node.left)
 		f(node.right)
 	}
@@ -64,14 +64,14 @@ func TestPostOrder(t *testing.T) {
 
 	var f func(node *MockNode)
 
-	r2 := make([]Elements, 0)
+	r2 := make([]Element, 0)
 	f = func(node *MockNode) {
 		if node == nil {
 			return
 		}
 		f(node.left)
 		f(node.right)
-		r2 = append(r2, node.elements)
+		r2 = append(r2, node.element)
 	}
 
 	f(tr.root)

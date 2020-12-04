@@ -4,10 +4,10 @@ import (
 	"github.com/Yu-33/gohelper/datastructs/container"
 )
 
-type Elements = container.Comparer
+type Element = container.Comparer
 
 type Node interface {
-	Elements() Elements
+	Element() Element
 	Left() Node
 	Right() Node
 }
