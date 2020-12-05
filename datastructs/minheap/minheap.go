@@ -59,33 +59,34 @@ func (h *MinHeap) Empty() bool {
 	return h.len == 0
 }
 
-// Push add element to the heap
-func (h *MinHeap) Push(item Element) {
+// Push add element to the heap, Return the index number of the location.
+func (h *MinHeap) Push(item Element) int {
 	if h.Len() == h.Cap() {
 		h.grow(h.cap * 2)
 	}
 
 	h.items[h.len] = item
 
-	var i, p int
-	k := h.len
+	var k, p int
+	i := h.len
 
 	for {
-		i = k
+		k = i
 
-		p = (k - 1) >> 1 // parent
-		if p >= 0 && h.items[k].Compare(h.items[p]) == -1 {
-			k = p
+		p = (i - 1) >> 1 // parent
+		if p >= 0 && h.items[i].Compare(h.items[p]) == -1 {
+			i = p
 		}
 
-		if i == k {
+		if k == i {
 			break
 		}
 
-		h.swap(i, k)
+		h.swap(k, i)
 	}
 
 	h.len++
+	return i
 }
 
 // Pop returns and removes the element that at the head.

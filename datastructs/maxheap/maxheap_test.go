@@ -42,7 +42,6 @@ func TestMaxHeap(t *testing.T) {
 
 	max := 33
 	maxKey := max * 10
-	keys := make([]container.Int64, max)
 
 	h := New(max)
 
@@ -50,8 +49,10 @@ func TestMaxHeap(t *testing.T) {
 		// enqueue and make queue full
 		for i := 0; i < max; i++ {
 			k := container.Int64(r.Intn(maxKey) + 1)
-			h.Push(k)
-			keys[i] = k
+
+			index := h.Push(k)
+			require.Equal(t, h.items[index].(container.Int64), k)
+
 			checkCorrect(t, h)
 		}
 		require.False(t, h.Empty())
