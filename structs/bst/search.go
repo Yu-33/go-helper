@@ -3,7 +3,7 @@ package bst
 import (
 	"reflect"
 
-	"github.com/Yu-33/gohelper/datastructs/stack"
+	"github.com/Yu-33/gohelper/structs/stack"
 )
 
 // SearchRange search for elements in a specified range from and and boundary (start <= k <= boundary)

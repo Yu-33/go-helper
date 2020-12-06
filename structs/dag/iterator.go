@@ -1,7 +1,7 @@
 package dag
 
 import (
-	"github.com/Yu-33/gohelper/datastructs/queue"
+	"github.com/Yu-33/gohelper/structs/queue"
 )
 
 // IterTopo implements Iterator by Topology algo

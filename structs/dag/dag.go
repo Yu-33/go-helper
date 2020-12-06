@@ -3,9 +3,9 @@ package dag
 import (
 	"fmt"
 
-	"github.com/Yu-33/gohelper/datastructs/container"
-	"github.com/Yu-33/gohelper/datastructs/rb"
-	"github.com/Yu-33/gohelper/datastructs/stack"
+	"github.com/Yu-33/gohelper/structs/container"
+	"github.com/Yu-33/gohelper/structs/rb"
+	"github.com/Yu-33/gohelper/structs/stack"
 )
 
 // DAG type implements a Directed Acyclic Graph data structure.

@@ -5,8 +5,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Yu-33/gohelper/datastructs/container"
-	"github.com/Yu-33/gohelper/datastructs/minheap"
+	"github.com/Yu-33/gohelper/structs/container"
+	"github.com/Yu-33/gohelper/structs/minheap"
 )
 
 const (

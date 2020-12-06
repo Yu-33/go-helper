@@ -3,8 +3,8 @@ package avl
 import (
 	"fmt"
 
-	"github.com/Yu-33/gohelper/datastructs/bst"
-	"github.com/Yu-33/gohelper/datastructs/container"
+	"github.com/Yu-33/gohelper/structs/bst"
+	"github.com/Yu-33/gohelper/structs/container"
 )
 
 type Element = container.Comparer

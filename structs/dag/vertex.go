@@ -1,7 +1,7 @@
 package dag
 
 import (
-	"github.com/Yu-33/gohelper/datastructs/container"
+	"github.com/Yu-33/gohelper/structs/container"
 )
 
 type Vertex = container.Comparer
