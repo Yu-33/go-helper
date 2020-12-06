@@ -18,6 +18,7 @@ type Node struct {
 	next    []*Node
 }
 
+// List implements data struct of skip list.
 type List struct {
 	head  *Node
 	level int
@@ -25,6 +26,7 @@ type List struct {
 	r     *rand.Rand
 }
 
+// New create an List.
 func New() *List {
 	sl := new(List)
 	sl.head = sl.createNode(nil, maxLevel)

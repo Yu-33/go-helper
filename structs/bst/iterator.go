@@ -6,6 +6,7 @@ import (
 	"github.com/Yu-33/gohelper/structs/stack"
 )
 
+// Iterator implements universal iterators are used for all-type binary trees
 type Iterator struct {
 	s        *stack.Stack
 	start    Element

@@ -12,7 +12,7 @@ const (
 
 type Element = container.Comparer
 
-// Node used in rb tree and implements bst.Node
+// Node used in rb tree and implements bst.Node.
 type Node struct {
 	element Element
 	left    *Node
@@ -33,11 +33,13 @@ func (n *Node) Right() bst.Node {
 	return n.right
 }
 
+// Tree implements data struct of red-black tree.
 type Tree struct {
 	root *Node
 	len  int
 }
 
+// New creates an red-black Tree.
 func New() *Tree {
 	tr := &Tree{
 		root: nil,
@@ -101,7 +103,7 @@ func (tr *Tree) Insert(element Element) bool {
 	return true
 }
 
-// Delete delete an elements from RB Tree, return false if elements not exists
+// Delete delete an elements from RB Tree, return false if elements not exists.
 func (tr *Tree) Delete(element Element) Element {
 	d := tr.root
 	for d != nil {
@@ -156,8 +158,8 @@ func (tr *Tree) Delete(element Element) Element {
 	return d.element
 }
 
-// Iter return a Iterator, include elements: start <= k <= boundary
-// start == first node if start == nil and boundary == last node if boundary == nil
+// Iter return a Iterator, include elements: start <= k <= boundary.
+// start == first node if start == nil and boundary == last node if boundary == nil.
 func (tr *Tree) Iter(start Element, boundary Element) container.Iterator {
 	it := bst.NewIterator(tr.root, start, boundary)
 	return it

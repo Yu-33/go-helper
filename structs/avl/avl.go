@@ -29,11 +29,13 @@ func (n *Node) Right() bst.Node {
 	return n.right
 }
 
+// Tree implements data struct of AVL tree.
 type Tree struct {
 	root *Node
 	len  int
 }
 
+// New creates an AVL Tree.
 func New() *Tree {
 	tr := &Tree{
 		root: nil,
