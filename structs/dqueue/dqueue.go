@@ -35,7 +35,8 @@ func (k1 *Item) Compare(target container.Comparer) int {
 	return 0
 }
 
-// DQueue implements a delay queue base on priority queue (min heap)
+// DQueue implements a delay queue base on priority queue (min heap).
+// Inspired by https://github.com/RussellLuo/timingwheel/blob/master/delayqueue/delayqueue.go.
 type DQueue struct {
 	C chan Value // Notify channel
 
