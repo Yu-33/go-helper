@@ -1,7 +1,7 @@
 package stack
 
 const (
-	defaultCapacity = 32
+	defaultCapacity = 64
 )
 
 // Stack implements a stack THAT LIFO.

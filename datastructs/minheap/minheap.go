@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	defaultCapacity = 32
+	defaultCapacity = 64
 )
 
 type Element = container.Comparer
@@ -70,7 +70,7 @@ func (h *MinHeap) Push(item Element) int {
 
 	var k, p int
 	i := h.len
-
+	// up
 	for {
 		k = i
 
@@ -103,7 +103,7 @@ func (h *MinHeap) Pop() Element {
 
 	var i, left, right int
 	k := 0
-
+	// down
 	for {
 		i = k
 

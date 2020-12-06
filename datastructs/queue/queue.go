@@ -1,7 +1,7 @@
 package queue
 
 const (
-	defaultCapacity = 32
+	defaultCapacity = 64
 )
 
 // Queue type implements a queue by dynamic array.

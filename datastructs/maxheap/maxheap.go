@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	defaultCapacity = 32
+	defaultCapacity = 64
 )
 
 type Element = container.Comparer
