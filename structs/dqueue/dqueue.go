@@ -102,22 +102,6 @@ func (dq *DQueue) Close() {
 	dq.mu.Unlock()
 }
 
-//func (dq *DQueue) send(value Value) (exit bool) {
-//	// Reset the sleeping state since there's no need to receive from wakeupC.
-//	if atomic.SwapInt32(&dq.sleeping, 0) == 0 {
-//		// A caller of Offer() is being blocked on sending to wakeupC,
-//		// drain wakeupC to unblock the caller.
-//		<-dq.wakeupC
-//	}
-//	select {
-//	case <-dq.exitC:
-//		return true
-//	case dq.C <- value:
-//		// The expired element has been sent out successfully.
-//	}
-//	return false
-//}
-
 func (dq *DQueue) peekAndShift() (*Item, int64) {
 	element := dq.pq.Peek()
 	if element == nil {
@@ -131,7 +115,7 @@ func (dq *DQueue) peekAndShift() (*Item, int64) {
 		return nil, delay
 	}
 
-	// Removed fro queue top
+	// Removed from queue top
 	_ = dq.pq.Pop()
 	return item, 0
 }
