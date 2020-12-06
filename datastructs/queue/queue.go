@@ -1,11 +1,11 @@
 package queue
 
 const (
-	defaultCapacity = 16
+	defaultCapacity = 32
 )
 
-// Queue type implements a queue by dynamic array;
-// Is not thread safe;
+// Queue type implements a queue by dynamic array.
+// Is not thread safe.
 type Queue struct {
 	items  []interface{}
 	cap    int
@@ -13,13 +13,13 @@ type Queue struct {
 	behind int
 }
 
-// New return a new Queue Type, n is the initialization capacity;
-// We will use the defaultCapacity if n <= 0
-func New(c int) *Queue {
-	if c <= 0 {
-		c = defaultCapacity
-	}
+// Default return a Queue with default parameters.
+func Default() *Queue {
+	return New(defaultCapacity)
+}
 
+// New creates a Queue with the specified the initialization capacity.
+func New(c int) *Queue {
 	c += 1
 	q := &Queue{
 		items:  make([]interface{}, c),
@@ -46,22 +46,22 @@ func (q *Queue) grow(c int) {
 	}
 }
 
-// Len return the number of elements in the queue
+// Len return the number of elements in the queue.
 func (q *Queue) Len() int {
 	return (q.behind - q.front + q.cap) % q.cap
 }
 
-// Cap return the current capacity of the queue
+// Cap return the current capacity of the queue.
 func (q *Queue) Cap() int {
 	return q.cap - 1
 }
 
-// Empty indicates whether the queue is empty
+// Empty indicates whether the queue is empty.
 func (q *Queue) Empty() bool {
 	return q.Len() == 0
 }
 
-// Push add element to the end of queue
+// Push add element to the end of queue.
 func (q *Queue) Push(item interface{}) {
 	if q.Len() == q.Cap() {
 		q.grow((q.cap - 1) * 2)
@@ -70,7 +70,7 @@ func (q *Queue) Push(item interface{}) {
 	q.behind = (q.behind + 1) % q.cap
 }
 
-// Pop returns and removes the element that at the head
+// Pop returns and removes the element that at the head.
 func (q *Queue) Pop() interface{} {
 	if q.Empty() {
 		return nil
@@ -80,7 +80,7 @@ func (q *Queue) Pop() interface{} {
 	return item
 }
 
-// Peek returns the element that at the head
+// Peek returns the element that at the head.
 func (q *Queue) Peek() interface{} {
 	if q.Empty() {
 		return nil

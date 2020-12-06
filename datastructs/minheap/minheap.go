@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	defaultCapacity = 16
+	defaultCapacity = 32
 )
 
 type Element = container.Comparer
@@ -17,12 +17,13 @@ type MinHeap struct {
 	len   int
 }
 
+// Default return a MinHeap with default parameters.
+func Default() *MinHeap {
+	return New(defaultCapacity)
+}
+
 // New return a MinHeap with the specifies initialization cap.
-// We will use the defaultCapacity if n <= 0.
 func New(c int) *MinHeap {
-	if c <= 0 {
-		c = defaultCapacity
-	}
 	h := &MinHeap{
 		items: make([]Element, c),
 		cap:   c,

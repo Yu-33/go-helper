@@ -28,6 +28,7 @@ func checkCorrect(t *testing.T, pq *MinHeap) {
 }
 
 func TestNew(t *testing.T) {
+	_ = Default()
 	max := 17
 	h := New(max)
 

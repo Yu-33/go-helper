@@ -12,7 +12,7 @@ func InOrder(node Node) []Element {
 	}
 
 	result := make([]Element, 0)
-	s := stack.New(-1)
+	s := stack.Default()
 	p := node
 
 	var i int
@@ -51,7 +51,7 @@ func PreOrder(node Node) []Element {
 	}
 
 	result := make([]Element, 0)
-	s := stack.New(-1)
+	s := stack.Default()
 	p := node
 
 	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
@@ -77,7 +77,7 @@ func PostOrder(node Node) []Element {
 
 	var lastVisit Node
 
-	s := stack.New(-1)
+	s := stack.Default()
 	p := node
 
 	for !reflect.ValueOf(p).IsNil() {

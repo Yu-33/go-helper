@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	defaultCapacity = 16
+	defaultCapacity = 32
 )
 
 type Element = container.Comparer
@@ -17,12 +17,13 @@ type MaxHeap struct {
 	len   int
 }
 
+// Default return a MaxHeap with default parameters.
+func Default() *MaxHeap {
+	return New(defaultCapacity)
+}
+
 // New return a MaxHeap with the specifies initialization cap.
-// We will use the defaultCapacity if n <= 0.
 func New(c int) *MaxHeap {
-	if c <= 0 {
-		c = defaultCapacity
-	}
 	h := &MaxHeap{
 		items: make([]Element, c),
 		cap:   c,

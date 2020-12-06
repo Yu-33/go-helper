@@ -11,7 +11,7 @@ type IterTopo struct {
 }
 
 func newIterTopo(g *DAG) *IterTopo {
-	q := queue.New(-1)
+	q := queue.Default()
 
 	inDegrees := make(map[*node]int)
 

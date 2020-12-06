@@ -14,7 +14,7 @@ func SearchRange(root Node, start Element, boundary Element) []Element {
 
 	var result []Element
 
-	s := stack.New(-1)
+	s := stack.Default()
 	p := root
 	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
 		if !reflect.ValueOf(p).IsNil() {

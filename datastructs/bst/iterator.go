@@ -13,7 +13,7 @@ type Iterator struct {
 }
 
 func NewIterator(root Node, start Element, boundary Element) *Iterator {
-	s := stack.New(-1)
+	s := stack.Default()
 
 	fillStack(root, start, boundary, s)
 

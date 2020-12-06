@@ -107,7 +107,7 @@ func (g *DAG) AddEdge(vertex, adjacency Vertex) bool {
 	adj := n2.(*node)
 
 	// check loop
-	s := stack.New(-1)
+	s := stack.Default()
 	s.Push(adj)
 
 	for !s.Empty() {
