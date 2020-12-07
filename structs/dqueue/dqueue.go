@@ -69,10 +69,19 @@ func New(qCap int, chanSize int) *DQueue {
 	return dq
 }
 
-// Offer add a new value to queue with specified delay time.
-func (dq *DQueue) Offer(delay time.Duration, value Value) {
+// Delay adds the value with specified delay time to queue.
+func (dq *DQueue) Delay(d time.Duration, value Value) {
+	dq.offer(dq.timeNow().Add(d).UnixNano(), value)
+}
+
+// Expiration adds the value with specified expiration time to queue.
+func (dq *DQueue) Expiration(exp int64, value Value) {
+	dq.offer(exp, value)
+}
+
+func (dq *DQueue) offer(exp int64, value Value) {
 	dq.mu.Lock()
-	item := &Item{Expiration: dq.timeNow().Add(delay).UnixNano(), Value: value}
+	item := &Item{Expiration: exp, Value: value}
 	index := dq.pq.Push(item)
 	dq.mu.Unlock()
 
@@ -80,6 +89,10 @@ func (dq *DQueue) Offer(delay time.Duration, value Value) {
 	if index == 0 && atomic.CompareAndSwapInt32(&dq.sleeping, 1, 0) {
 		dq.wakeupC <- struct{}{}
 	}
+}
+
+func (dq *DQueue) timeNow() time.Time {
+	return time.Now()
 }
 
 // Receive register a func to be called if some item expires.
@@ -101,10 +114,6 @@ func (dq *DQueue) Close() {
 	dq.mu.Lock()
 	close(dq.exitC)
 	dq.mu.Unlock()
-}
-
-func (dq *DQueue) timeNow() time.Time {
-	return time.Now()
 }
 
 func (dq *DQueue) peekAndShift() (*Item, int64) {
