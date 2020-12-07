@@ -36,7 +36,7 @@ func (k1 *Item) Compare(target container.Comparer) int {
 }
 
 // DQueue implements a delay queue base on priority queue (min heap).
-// Inspired by https://github.com/RussellLuo/timingwheel/blob/master/delayqueue/delayqueue.go.
+// Inspired by https://github.com/RussellLuo/timingwheel/blob/master/delayqueue/delayqueue.go
 type DQueue struct {
 	C chan Value // Notify channel
 
@@ -72,7 +72,7 @@ func New(qCap int, chanSize int) *DQueue {
 // Offer add a new value to queue with specified delay time.
 func (dq *DQueue) Offer(delay time.Duration, value Value) {
 	dq.mu.Lock()
-	item := &Item{Expiration: time.Now().Add(delay).UnixNano(), Value: value}
+	item := &Item{Expiration: dq.timeNow().Add(delay).UnixNano(), Value: value}
 	index := dq.pq.Push(item)
 	dq.mu.Unlock()
 
@@ -103,6 +103,10 @@ func (dq *DQueue) Close() {
 	dq.mu.Unlock()
 }
 
+func (dq *DQueue) timeNow() time.Time {
+	return time.Now()
+}
+
 func (dq *DQueue) peekAndShift() (*Item, int64) {
 	element := dq.pq.Peek()
 	if element == nil {
@@ -111,7 +115,7 @@ func (dq *DQueue) peekAndShift() (*Item, int64) {
 	}
 
 	item := element.(*Item)
-	delay := item.Expiration - time.Now().UnixNano()
+	delay := item.Expiration - dq.timeNow().UnixNano()
 	if delay > 0 {
 		return nil, delay
 	}
