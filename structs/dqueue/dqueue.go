@@ -69,13 +69,13 @@ func New(qCap int, chanSize int) *DQueue {
 	return dq
 }
 
-// Delay adds the value with specified delay time to queue.
-func (dq *DQueue) Delay(d time.Duration, value Value) {
-	dq.offer(dq.timeNow().Add(d).UnixNano(), value)
+// After adds the value with specified delay time to queue.
+func (dq *DQueue) After(delay time.Duration, value Value) {
+	dq.offer(dq.timeNow().Add(delay).UnixNano(), value)
 }
 
-// Expiration adds the value with specified expiration time to queue.
-func (dq *DQueue) Expiration(exp int64, value Value) {
+// Expire adds the value with specified expiration timestamp(in nanoseconds) to queue.
+func (dq *DQueue) Expire(exp int64, value Value) {
 	dq.offer(exp, value)
 }
 
