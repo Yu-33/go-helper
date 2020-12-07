@@ -98,6 +98,9 @@ func (dq *DQueue) timeNow() time.Time {
 
 // Receive register a func to be called if some item expires.
 func (dq *DQueue) Receive(f Receiver) {
+	dq.wg.Add(1)
+	defer dq.wg.Done()
+
 	for {
 		select {
 		case <-dq.exitC:
