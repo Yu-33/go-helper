@@ -45,7 +45,8 @@ type DQueue struct {
 	sleeping int32         // Similar to the sleeping state of runtime.timers. 1 => true, 0 => false.
 	wakeupC  chan struct{} // Used to wakeup poll goroutine when item add to queue head.
 
-	exitC chan struct{} // Used to make poll goroutine exit.
+	exitC chan struct{}   // Used to make poll goroutine exit.
+	wg    *sync.WaitGroup // Used wait polling exit when close queue.
 }
 
 // Default return a DQueue with default parameters.
@@ -62,6 +63,7 @@ func New(qCap int) *DQueue {
 		sleeping: 0,
 		wakeupC:  make(chan struct{}),
 		exitC:    make(chan struct{}),
+		wg:       new(sync.WaitGroup),
 	}
 
 	go dq.polling()
@@ -108,9 +110,9 @@ func (dq *DQueue) Receive(f Receiver) {
 
 // Close to notify the polling exit. can't be called repeatedly.
 func (dq *DQueue) Close() {
-	dq.mu.Lock()
 	close(dq.exitC)
-	dq.mu.Unlock()
+	// Waiting for polling exit.
+	dq.wg.Wait()
 }
 
 func (dq *DQueue) peekAndShift() (*Item, int64) {
@@ -132,9 +134,11 @@ func (dq *DQueue) peekAndShift() (*Item, int64) {
 }
 
 func (dq *DQueue) polling() {
+	dq.wg.Add(1)
 	defer func() {
 		// Reset the sleeping states
 		atomic.StoreInt32(&dq.sleeping, 0)
+		dq.wg.Done()
 	}()
 
 LOOP:
