@@ -17,12 +17,12 @@ type MaxHeap struct {
 	len   int
 }
 
-// Default return a MaxHeap with default parameters.
+// Default creates an MaxHeap with default parameters.
 func Default() *MaxHeap {
 	return New(defaultCapacity)
 }
 
-// New return a MaxHeap with the specifies initialization cap.
+// New creates an MaxHeap with given initialization capacity.
 func New(c int) *MaxHeap {
 	h := &MaxHeap{
 		items: make([]Element, c),

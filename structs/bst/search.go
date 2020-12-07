@@ -6,7 +6,7 @@ import (
 	"github.com/Yu-33/gohelper/structs/stack"
 )
 
-// SearchRange search for elements in a specified range from and and boundary (start <= k <= boundary)
+// SearchRange search for elements in a specified range from and and boundary (start <= k <= boundary).
 func SearchRange(root Node, start Element, boundary Element) []Element {
 	if root == nil {
 		return nil
@@ -39,7 +39,7 @@ func SearchRange(root Node, start Element, boundary Element) []Element {
 	return result
 }
 
-// SearchLastLT search for the last node that less than the 'key';
+// SearchLastLT search for the last node that less than the 'key'.
 func SearchLastLT(root Node, key Element) Element {
 	if root == nil || key == nil {
 		return nil
@@ -65,7 +65,7 @@ func SearchLastLT(root Node, key Element) Element {
 	return nil
 }
 
-// SearchLastLE search for the last node that less than or equal to the 'key';
+// SearchLastLE search for the last node that less than or equal to the 'key'.
 func SearchLastLE(root Node, key Element) Element {
 	if root == nil || key == nil {
 		return nil
@@ -94,7 +94,7 @@ func SearchLastLE(root Node, key Element) Element {
 	return nil
 }
 
-// SearchFirstGT search for the first node that greater than to the 'key';
+// SearchFirstGT search for the first node that greater than to the 'key'.
 func SearchFirstGT(root Node, key Element) Element {
 	if root == nil || key == nil {
 		return nil
@@ -120,7 +120,7 @@ func SearchFirstGT(root Node, key Element) Element {
 	return nil
 }
 
-// SearchFirstGE search for the first node that greater than or equal to the 'key';
+// SearchFirstGE search for the first node that greater than or equal to the 'key'.
 func SearchFirstGE(root Node, key Element) Element {
 	if root == nil || key == nil {
 		return nil

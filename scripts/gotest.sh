@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# scripts to help for run go test case
+# scripts to help for run go test case.
 # ./gotest.sh <package name> <test case> <package name> ...
 
-#find ./* -type f -name "*.go" -exec dirname {} \; | sort|uniq |xargs -i go test -v {} -test.run=".*";
+# find ./* -type f -name "*.go" -exec dirname {} \; | sort|uniq |xargs -i go test -v {} -test.run=".*".
 
 CURRENT_PATH=$(cd "$(dirname "$0")" || exit 1; pwd)
 cd "${CURRENT_PATH}"/.. || exit 1

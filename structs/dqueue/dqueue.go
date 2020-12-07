@@ -49,12 +49,12 @@ type DQueue struct {
 	wg    *sync.WaitGroup // Used wait polling exit when close queue.
 }
 
-// Default return a DQueue with default parameters.
+// Default creates an DQueue with default parameters.
 func Default() *DQueue {
 	return New(defaultCapacity)
 }
 
-// New create a new DQueue with specified qCap(queue capacity).
+// New creates an DQueue with given qCap(queue capacity).
 func New(qCap int) *DQueue {
 	dq := &DQueue{
 		C:        make(chan Value),

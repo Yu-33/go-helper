@@ -26,7 +26,7 @@ type List struct {
 	r     *rand.Rand
 }
 
-// New create an List.
+// New creates an Skip List.
 func New() *List {
 	sl := new(List)
 	sl.head = sl.createNode(nil, maxLevel)
@@ -36,12 +36,12 @@ func New() *List {
 	return sl
 }
 
-// Len return number of elements
+// Len return number of elements.
 func (sl *List) Len() int {
 	return sl.lens[0]
 }
 
-// Search for find the specified elements
+// Search for find the specified elements.
 func (sl *List) Search(elements Element) Element {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
@@ -55,7 +55,7 @@ func (sl *List) Search(elements Element) Element {
 	return nil
 }
 
-// Insert for insert into specified elements, return false if duplicate;
+// Insert for insert into specified elements, return false if duplicate.
 func (sl *List) Insert(elements Element) bool {
 	var updates [maxLevel + 1]*Node
 
@@ -85,7 +85,7 @@ func (sl *List) Insert(elements Element) bool {
 	return true
 }
 
-// Delete for delete specified elements, return nil if not found
+// Delete for delete specified elements, return nil if not found.
 func (sl *List) Delete(elements Element) Element {
 	var d *Node
 	p := sl.head
@@ -109,8 +109,8 @@ func (sl *List) Delete(elements Element) Element {
 	return d.element
 }
 
-// Iter return a Iterator, include elements: start <= k <= boundary
-// start == first node if start == nil and boundary == last node if boundary == nil
+// Iter return a Iterator, include elements: start <= k <= boundary.
+// start == first node if start == nil and boundary == last node if boundary == nil.
 func (sl *List) Iter(start Element, boundary Element) container.Iterator {
 	iter := newIterator(sl, start, boundary)
 	return iter
@@ -131,7 +131,7 @@ func (sl *List) chooseLevel() int {
 	return level
 }
 
-// Search the last node that less than the 'key';
+// Search the last node that less than the 'key'.
 func (sl *List) searchLastLT(key Element) *Node {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
@@ -143,11 +143,10 @@ func (sl *List) searchLastLT(key Element) *Node {
 			return p
 		}
 	}
-
 	return nil
 }
 
-// Search the last node that less than or equal to the 'key';
+// Search the last node that less than or equal to the 'key'.
 func (sl *List) searchLastLE(key Element) *Node {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
@@ -162,11 +161,10 @@ func (sl *List) searchLastLE(key Element) *Node {
 		}
 
 	}
-
 	return nil
 }
 
-// Search the first node that greater than to the 'key';
+// Search the first node that greater than to the 'key'.
 func (sl *List) searchFirstGT(key Element) *Node {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
@@ -184,11 +182,10 @@ func (sl *List) searchFirstGT(key Element) *Node {
 		}
 
 	}
-
 	return nil
 }
 
-// Search the first node that greater than or equal to the 'key';
+// Search the first node that greater than or equal to the 'key'.
 func (sl *List) searchFirstGE(key Element) *Node {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
@@ -203,6 +200,5 @@ func (sl *List) searchFirstGE(key Element) *Node {
 		}
 
 	}
-
 	return nil
 }

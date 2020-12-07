@@ -4,7 +4,7 @@ import (
 	"github.com/Yu-33/gohelper/structs/queue"
 )
 
-// IterTopo implements Iterator by Topology algo
+// IterTopo implements Iterator by Topology algo.
 type IterTopo struct {
 	q         *queue.Queue
 	inDegrees map[*node]int

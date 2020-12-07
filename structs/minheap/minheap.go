@@ -17,12 +17,12 @@ type MinHeap struct {
 	len   int
 }
 
-// Default return a MinHeap with default parameters.
+// Default creates an MinHeap with default parameters.
 func Default() *MinHeap {
 	return New(defaultCapacity)
 }
 
-// New return a MinHeap with the specifies initialization cap.
+// New creates an MinHeap with given initialization capacity.
 func New(c int) *MinHeap {
 	h := &MinHeap{
 		items: make([]Element, c),

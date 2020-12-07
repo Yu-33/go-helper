@@ -48,12 +48,12 @@ func New() *Tree {
 	return tr
 }
 
-// Len return number of elements
+// Len return number of elements.
 func (tr *Tree) Len() int {
 	return tr.len
 }
 
-// Search search elements in RB Tree, return nil if elements not exists
+// Search search elements in RB Tree, return nil if elements not exists.
 func (tr *Tree) Search(element Element) Element {
 	p := tr.root
 	for p != nil {
@@ -69,7 +69,7 @@ func (tr *Tree) Search(element Element) Element {
 	return nil
 }
 
-// Insert insert an elements into RB Tree, return false if have duplicate elements
+// Insert insert an elements into RB Tree, return false if have duplicate elements.
 func (tr *Tree) Insert(element Element) bool {
 	var n *Node
 	p := tr.root

@@ -13,12 +13,12 @@ type Queue struct {
 	behind int
 }
 
-// Default return a Queue with default parameters.
+// Default creates an Queue with default parameters.
 func Default() *Queue {
 	return New(defaultCapacity)
 }
 
-// New creates a Queue with the specified the initialization capacity.
+// New creates an Queue with given initialization capacity.
 func New(c int) *Queue {
 	c += 1
 	q := &Queue{

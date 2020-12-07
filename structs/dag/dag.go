@@ -8,17 +8,19 @@ import (
 	"github.com/Yu-33/gohelper/structs/stack"
 )
 
-// DAG type implements a Directed Acyclic Graph data structure.
+// DAG implements data struct of Directed Acyclic Graph.
 type DAG struct {
 	vertexes container.Container
 }
 
+// New creates an DAG.
 func New() *DAG {
 	g := new(DAG)
 	g.vertexes = rb.New()
 	return g
 }
 
+// InDegreeToString return strings by in-degree.
 func (g *DAG) InDegreeToString() string {
 	s := "{ "
 	it1 := g.vertexes.Iter(nil, nil)
@@ -37,6 +39,7 @@ func (g *DAG) InDegreeToString() string {
 	return s
 }
 
+// OutDegreeToString return strings by out-degree.
 func (g *DAG) OutDegreeToString() string {
 	s := "{ "
 	it1 := g.vertexes.Iter(nil, nil)
@@ -55,7 +58,7 @@ func (g *DAG) OutDegreeToString() string {
 	return s
 }
 
-// AddVertex add new vertex into DAG, return false if vertex already exists
+// AddVertex add new vertex into DAG, return false if vertex already exists.
 func (g *DAG) AddVertex(vertex Vertex) bool {
 	n := &node{vex: vertex}
 	ok := g.vertexes.Insert(n)
@@ -67,7 +70,7 @@ func (g *DAG) AddVertex(vertex Vertex) bool {
 	return true
 }
 
-// DelVertex delete a vertex from DAG, return false if vertex not exists
+// DelVertex delete a vertex from DAG, return false if vertex not exists.
 func (g *DAG) DelVertex(vertex Vertex) bool {
 	n1 := g.vertexes.Delete(&node{vex: vertex})
 	if n1 == nil {
@@ -87,8 +90,8 @@ func (g *DAG) DelVertex(vertex Vertex) bool {
 	return true
 }
 
-// AddEdge add an edge from vertex to adjacency;
-// return false when There is a loop between vertex and adjacency;
+// AddEdge add an edge from vertex to adjacency.
+// return false when There is a loop between vertex and adjacency.
 func (g *DAG) AddEdge(vertex, adjacency Vertex) bool {
 	if vertex.Compare(adjacency) == 0 {
 		return false
@@ -129,6 +132,7 @@ func (g *DAG) AddEdge(vertex, adjacency Vertex) bool {
 	return true
 }
 
+// DelEdge delete edges from vertex to adjacency.
 func (g *DAG) DelEdge(vertex, adjacency Vertex) bool {
 	n1 := g.vertexes.Search(&node{vex: vertex})
 	if n1 == nil {

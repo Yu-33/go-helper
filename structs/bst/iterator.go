@@ -13,6 +13,7 @@ type Iterator struct {
 	boundary Element
 }
 
+// New creates an Iterator with given parameters.
 func NewIterator(root Node, start Element, boundary Element) *Iterator {
 	s := stack.Default()
 
