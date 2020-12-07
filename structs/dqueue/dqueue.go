@@ -11,7 +11,6 @@ import (
 
 const (
 	defaultCapacity = 64
-	defaultChanSize = 8
 )
 
 type Value interface{}
@@ -51,13 +50,13 @@ type DQueue struct {
 
 // Default return a DQueue with default parameters.
 func Default() *DQueue {
-	return New(defaultCapacity, defaultChanSize)
+	return New(defaultCapacity)
 }
 
-// New create a new DQueue with specified qCap(queue capacity) and chanSize(channel buffer capacity).
-func New(qCap int, chanSize int) *DQueue {
+// New create a new DQueue with specified qCap(queue capacity).
+func New(qCap int) *DQueue {
 	dq := &DQueue{
-		C:        make(chan Value, chanSize),
+		C:        make(chan Value),
 		pq:       minheap.New(qCap),
 		mu:       new(sync.Mutex),
 		sleeping: 0,
@@ -97,16 +96,14 @@ func (dq *DQueue) timeNow() time.Time {
 
 // Receive register a func to be called if some item expires.
 func (dq *DQueue) Receive(f Receiver) {
-	go func() {
-		for {
-			select {
-			case <-dq.exitC:
-				return
-			case value := <-dq.C:
-				f(value)
-			}
+	for {
+		select {
+		case <-dq.exitC:
+			return
+		case value := <-dq.C:
+			f(value)
 		}
-	}()
+	}
 }
 
 // Close to notify the polling exit. can't be called repeatedly.
