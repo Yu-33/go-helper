@@ -12,15 +12,6 @@ help:
 	@echo "  test    to run test case"
 	@exit 0
 
-TEST = _test() {                              \
-	args="$(filter-out $@,$(MAKECMDGOALS))";  \
-	if [[ $(VERBOSE) = "yes" ]]; then         \
-        bash -x scripts/gotest.sh $$args;     \
-    else                                      \
-        bash scripts/gotest.sh $$args;        \
-    fi;                                       \
-}
-
 .PHONY: format
 format:
 	@[[ ${VERBOSE} = "yes" ]] && set -x; go fmt ./...;
@@ -39,7 +30,7 @@ check: format vet lint
 
 .PHONY: test
 test:
-	@$(TEST); _test
+	@[[ ${VERBOSE} = "yes" ]] && set -x; go test -race -v ./... -test.count=1 -failfast;
 
 .DEFAULT_GOAL = help
 
