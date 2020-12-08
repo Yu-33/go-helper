@@ -9,6 +9,16 @@ import (
 	"github.com/Yu-33/gohelper/dqueue"
 )
 
+const (
+	defaultTick = time.Millisecond
+	defaultSize = int64(32)
+)
+
+var (
+	ErrInvalidTick = errors.New("timewheel: tick must be greater than or equal to 1ms")
+	ErrInvalidSize = errors.New("timewheel: size must be greater than 0")
+)
+
 // TimeWheel is an implementation of Hierarchical Timing Wheels.
 // Inspired by https://github.com/RussellLuo/timingwheel
 type TimeWheel struct {
@@ -28,14 +38,18 @@ type TimeWheel struct {
 
 // Default creates an TimeWheel with default parameters.
 func Default() *TimeWheel {
-	return New(time.Millisecond, 32)
+	return New(defaultTick, defaultSize)
 }
 
-// New creates an TimeWheel with the given tick and size.
+// New creates an TimeWheel with the given tick and wheel size.
 func New(tick time.Duration, size int64) *TimeWheel {
-	if tick/time.Millisecond <= 0 {
-		panic(errors.New("tick must be greater than or equal to 1ms"))
+	if tick < time.Millisecond {
+		panic(ErrInvalidTick)
 	}
+	if size < 1 {
+		panic(ErrInvalidSize)
+	}
+
 	return newTimeWheel(int64(tick), size, time.Now().UnixNano(), dqueue.Default())
 }
 

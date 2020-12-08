@@ -22,6 +22,22 @@ func TestNew(t *testing.T) {
 	require.True(t, tw.overflow == nil)
 }
 
+func TestDefault(t *testing.T) {
+	tw := Default()
+	require.NotNil(t, tw)
+	require.Equal(t, tw.size, defaultSize)
+	require.Equal(t, tw.tick, int64(defaultTick))
+}
+
+func TestNew_Panic(t *testing.T) {
+	require.PanicsWithError(t, ErrInvalidTick.Error(), func() {
+		New(time.Millisecond-1, 1)
+	})
+	require.PanicsWithError(t, ErrInvalidSize.Error(), func() {
+		New(time.Millisecond, 0)
+	})
+}
+
 func TestTimeWheel_AfterFunc(t *testing.T) {
 	tw := New(time.Millisecond, 3)
 	go tw.Start()
