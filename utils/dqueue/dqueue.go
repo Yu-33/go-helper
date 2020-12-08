@@ -16,9 +16,9 @@ const (
 type Value interface{}
 type Receiver func(value Value)
 
-// Item declares a data-type used in priority queue.
+// Item represents an element in priority queue.
 type Item struct {
-	Expiration int64 // Expiration time of nano timestamp
+	Expiration int64 // Expiration time of nanoseconds timestamp.
 	Value      Value
 }
 
@@ -54,20 +54,24 @@ func Default() *DQueue {
 	return New(defaultCapacity)
 }
 
-// New creates an DQueue with given qCap(queue capacity).
-func New(qCap int) *DQueue {
-	dq := &DQueue{
+// New creates an DQueue with given c(queue capacity).
+func New(c int) *DQueue {
+	dq := newDQueue(c)
+	go dq.polling()
+	return dq
+}
+
+// newDQueue is an internal helper function that really creates an DQueue.
+func newDQueue(c int) *DQueue {
+	return &DQueue{
 		C:        make(chan Value),
-		pq:       minheap.New(qCap),
+		pq:       minheap.New(c),
 		mu:       new(sync.Mutex),
 		sleeping: 0,
 		wakeupC:  make(chan struct{}),
 		exitC:    make(chan struct{}),
 		wg:       new(sync.WaitGroup),
 	}
-
-	go dq.polling()
-	return dq
 }
 
 // After adds the value with specified delay time to queue.
@@ -131,7 +135,7 @@ func (dq *DQueue) peekAndShift() (*Item, int64) {
 		return nil, delay
 	}
 
-	// Removed from queue top
+	// Removed from queue top.
 	_ = dq.pq.Pop()
 	return item, 0
 }
@@ -139,7 +143,7 @@ func (dq *DQueue) peekAndShift() (*Item, int64) {
 func (dq *DQueue) polling() {
 	dq.wg.Add(1)
 	defer func() {
-		// Reset the sleeping states
+		// Reset the sleeping states.
 		atomic.StoreInt32(&dq.sleeping, 0)
 		dq.wg.Done()
 	}()
