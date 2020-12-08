@@ -1,6 +1,7 @@
 package dqueue
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -34,48 +35,99 @@ func TestDefault(t *testing.T) {
 	require.Equal(t, dq.pq.Cap(), defaultCapacity)
 }
 
+type Result struct {
+	T time.Time
+	V time.Duration
+}
+
 func TestDQueue_After(t *testing.T) {
 	dq := Default()
 	defer dq.Close()
 
-	var x int
-	exitC := make(chan struct{})
+	retC := make(chan *Result)
 
 	go func() {
 		dq.Receive(func(value Value) {
-			x = value.(int)
-			close(exitC)
+			retC <- &Result{
+				T: time.Now(),
+				V: value.(time.Duration),
+			}
 		})
 	}()
 
+	seeds := []time.Duration{
+		time.Millisecond * 1,
+		time.Millisecond * 5,
+		time.Millisecond * 10,
+		time.Millisecond * 50,
+		time.Millisecond * 100,
+		time.Millisecond * 400,
+		time.Millisecond * 500,
+		time.Second * 1,
+	}
+
+	lapse := time.Duration(0)
 	start := time.Now()
-	dq.After(time.Second, 1024)
 
-	<-exitC
+	for _, d := range seeds {
+		dq.After(d, d)
+	}
 
-	require.Equal(t, x, 1024)
-	require.Equal(t, int(time.Since(start).Seconds()), 1)
+	for _, d := range seeds {
+		lapse += d
+		min := start.Add(d)
+		max := start.Add(lapse + time.Millisecond*3)
+
+		got := <-retC
+
+		require.Equal(t, d, got.V)
+		require.Greater(t, got.T.UnixNano(), min.UnixNano(), fmt.Sprintf("%s: got: %s, want: %s", d.String(), got.T.String(), min.String()))
+		require.Less(t, got.T.UnixNano(), max.UnixNano(), fmt.Sprintf("%s: got: %s, want: %s", d.String(), got.T.String(), max.String()))
+	}
 }
 
 func TestDQueue_Expire(t *testing.T) {
 	dq := Default()
 	defer dq.Close()
 
-	var x int
-	exitC := make(chan struct{})
+	retC := make(chan *Result)
 
 	go func() {
 		dq.Receive(func(value Value) {
-			x = value.(int)
-			close(exitC)
+			retC <- &Result{
+				T: time.Now(),
+				V: value.(time.Duration),
+			}
 		})
 	}()
 
+	seeds := []time.Duration{
+		time.Millisecond * 1,
+		time.Millisecond * 5,
+		time.Millisecond * 10,
+		time.Millisecond * 50,
+		time.Millisecond * 100,
+		time.Millisecond * 400,
+		time.Millisecond * 500,
+		time.Second * 1,
+	}
+
+	lapse := time.Duration(0)
 	start := time.Now()
-	dq.Expire(time.Now().Add(time.Second).UnixNano(), 1024)
 
-	<-exitC
+	for _, d := range seeds {
+		dq.Expire(time.Now().Add(d).UnixNano(), d)
+	}
 
-	require.Equal(t, x, 1024)
-	require.Equal(t, int(time.Since(start).Seconds()), 1)
+	for _, d := range seeds {
+		lapse += d
+		min := start.Add(d)
+		max := start.Add(lapse + time.Millisecond*3)
+
+		got := <-retC
+
+		require.Equal(t, d, got.V)
+		require.Greater(t, got.T.UnixNano(), min.UnixNano(), fmt.Sprintf("%s: got: %s, want: %s", d.String(), got.T.String(), min.String()))
+		require.Less(t, got.T.UnixNano(), max.UnixNano(), fmt.Sprintf("%s: got: %s, want: %s", d.String(), got.T.String(), max.String()))
+	}
 }
