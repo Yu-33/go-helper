@@ -2,6 +2,7 @@ package dqueue
 
 import (
 	"fmt"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -18,7 +19,7 @@ func TestNew(t *testing.T) {
 	require.NotNil(t, dq.mu)
 	require.NotNil(t, dq.pq)
 	require.Equal(t, dq.pq.Cap(), capacity)
-	require.Equal(t, dq.sleeping, int32(0))
+	require.Equal(t, atomic.LoadInt32(&dq.sleeping), int32(0))
 	require.NotNil(t, dq.wakeupC)
 	require.NotNil(t, dq.exitC)
 	require.NotNil(t, dq.wg)
@@ -26,7 +27,7 @@ func TestNew(t *testing.T) {
 	go dq.polling()
 	time.Sleep(time.Millisecond * 10)
 
-	require.Equal(t, dq.sleeping, int32(1))
+	require.Equal(t, atomic.LoadInt32(&dq.sleeping), int32(1))
 }
 
 func TestDefault(t *testing.T) {
@@ -76,7 +77,7 @@ func TestDQueue_After(t *testing.T) {
 	for _, d := range seeds {
 		lapse += d
 		min := start.Add(d)
-		max := start.Add(lapse + time.Millisecond*3)
+		max := start.Add(lapse + time.Millisecond*5)
 
 		got := <-retC
 
@@ -122,7 +123,7 @@ func TestDQueue_Expire(t *testing.T) {
 	for _, d := range seeds {
 		lapse += d
 		min := start.Add(d)
-		max := start.Add(lapse + time.Millisecond*3)
+		max := start.Add(lapse + time.Millisecond*5)
 
 		got := <-retC
 
