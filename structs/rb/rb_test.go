@@ -127,9 +127,9 @@ func TestRBTree(t *testing.T) {
 
 	// search
 	for i := 0; i < length; i++ {
-		elements := tr.Search(keys[i])
-		require.NotNil(t, elements)
-		require.Equal(t, elements.Compare(keys[i]), 0)
+		element := tr.Search(keys[i])
+		require.NotNil(t, element)
+		require.Equal(t, element.Compare(keys[i]), 0)
 	}
 
 	// delete

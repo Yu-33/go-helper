@@ -41,22 +41,22 @@ func (sl *List) Len() int {
 	return sl.lens[0]
 }
 
-// Search for find the specified elements.
-func (sl *List) Search(elements Element) Element {
+// Search for find the specified element.
+func (sl *List) Search(element Element) Element {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
-		for p.next[i] != nil && p.next[i].element.Compare(elements) == -1 {
+		for p.next[i] != nil && p.next[i].element.Compare(element) == -1 {
 			p = p.next[i]
 		}
-		if p.next[i] != nil && p.next[i].element.Compare(elements) == 0 {
+		if p.next[i] != nil && p.next[i].element.Compare(element) == 0 {
 			return p.next[i].element
 		}
 	}
 	return nil
 }
 
-// Insert for insert into specified elements, return false if duplicate.
-func (sl *List) Insert(elements Element) bool {
+// Insert for insert into specified element, return false if duplicate.
+func (sl *List) Insert(element Element) bool {
 	var updates [maxLevel + 1]*Node
 
 	level := sl.chooseLevel()
@@ -66,16 +66,16 @@ func (sl *List) Insert(elements Element) bool {
 
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
-		for p.next[i] != nil && p.next[i].element.Compare(elements) == -1 {
+		for p.next[i] != nil && p.next[i].element.Compare(element) == -1 {
 			p = p.next[i]
 		}
-		if p.next[i] != nil && p.next[i].element.Compare(elements) == 0 {
+		if p.next[i] != nil && p.next[i].element.Compare(element) == 0 {
 			return false
 		}
 		updates[i] = p
 	}
 
-	node := sl.createNode(elements, level)
+	node := sl.createNode(element, level)
 	for i := 0; i <= level; i++ {
 		node.next[i] = updates[i].next[i]
 		updates[i].next[i] = node
@@ -85,16 +85,16 @@ func (sl *List) Insert(elements Element) bool {
 	return true
 }
 
-// Delete for delete specified elements, return nil if not found.
-func (sl *List) Delete(elements Element) Element {
+// Delete for delete specified element, return nil if not found.
+func (sl *List) Delete(element Element) Element {
 	var d *Node
 	p := sl.head
 
 	for i := sl.level; i >= 0; i-- {
-		for p.next[i] != nil && p.next[i].element.Compare(elements) == -1 {
+		for p.next[i] != nil && p.next[i].element.Compare(element) == -1 {
 			p = p.next[i]
 		}
-		if p.next[i] != nil && p.next[i].element.Compare(elements) == 0 {
+		if p.next[i] != nil && p.next[i].element.Compare(element) == 0 {
 			if d == nil {
 				d = p.next[i]
 			}
@@ -116,9 +116,9 @@ func (sl *List) Iter(start Element, boundary Element) container.Iterator {
 	return iter
 }
 
-func (sl *List) createNode(elements Element, level int) *Node {
+func (sl *List) createNode(element Element, level int) *Node {
 	n := new(Node)
-	n.element = elements
+	n.element = element
 	n.next = make([]*Node, level+1)
 	return n
 }

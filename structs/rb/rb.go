@@ -53,7 +53,7 @@ func (tr *Tree) Len() int {
 	return tr.len
 }
 
-// Search search elements in RB Tree, return nil if elements not exists.
+// Search search element in RB Tree, return nil if element not exists.
 func (tr *Tree) Search(element Element) Element {
 	p := tr.root
 	for p != nil {
@@ -69,7 +69,7 @@ func (tr *Tree) Search(element Element) Element {
 	return nil
 }
 
-// Insert insert an elements into RB Tree, return false if have duplicate elements.
+// Insert insert an element into RB Tree, return false if have duplicate element.
 func (tr *Tree) Insert(element Element) bool {
 	var n *Node
 	p := tr.root
@@ -103,7 +103,7 @@ func (tr *Tree) Insert(element Element) bool {
 	return true
 }
 
-// Delete delete an elements from RB Tree, return false if elements not exists.
+// Delete delete an element from RB Tree, return false if element not exists.
 func (tr *Tree) Delete(element Element) Element {
 	d := tr.root
 	for d != nil {

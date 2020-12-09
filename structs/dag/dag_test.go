@@ -25,12 +25,12 @@ func TestDAG_AddVertex(t *testing.T) {
 		require.False(t, g.AddVertex(vertexes[i]))
 	}
 
-	// test internal elements
+	// test internal element
 	it1 := g.vertexes.Iter(nil, nil)
 	for it1.Valid() {
-		elements := it1.Next()
-		require.NotNil(t, elements)
-		n, ok := elements.(*node)
+		element := it1.Next()
+		require.NotNil(t, element)
+		n, ok := element.(*node)
 		require.True(t, ok)
 		require.NotNil(t, n.vex)
 		require.NotNil(t, n.in)

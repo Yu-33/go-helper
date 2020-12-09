@@ -45,7 +45,7 @@ func (h *MaxHeap) swap(i, j int) {
 	h.items[i], h.items[j] = h.items[j], h.items[i]
 }
 
-// Len return the number of elements in the heap.
+// Len return the number of element in the heap.
 func (h *MaxHeap) Len() int {
 	return h.len
 }

@@ -40,8 +40,8 @@ func (iter *Iterator) Next() Element {
 		return nil
 	}
 
-	elements := iter.node.element
+	element := iter.node.element
 	iter.node = iter.node.next[0]
 
-	return elements
+	return element
 }

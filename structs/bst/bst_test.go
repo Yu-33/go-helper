@@ -29,19 +29,19 @@ type MockTree struct {
 	root *MockNode
 }
 
-func (tr *MockTree) Insert(elements Element) bool {
+func (tr *MockTree) Insert(element Element) bool {
 	p := tr.root
 	for p != nil {
-		flag := elements.Compare(p.element)
+		flag := element.Compare(p.element)
 		if flag == -1 {
 			if p.left == nil {
-				p.left = &MockNode{element: elements}
+				p.left = &MockNode{element: element}
 				break
 			}
 			p = p.left
 		} else if flag == 1 {
 			if p.right == nil {
-				p.right = &MockNode{element: elements}
+				p.right = &MockNode{element: element}
 				break
 			}
 			p = p.right
@@ -51,7 +51,7 @@ func (tr *MockTree) Insert(elements Element) bool {
 	}
 
 	if p == nil {
-		tr.root = &MockNode{element: elements}
+		tr.root = &MockNode{element: element}
 	}
 
 	return true

@@ -48,10 +48,10 @@ func (tr *Tree) Len() int {
 	return tr.len
 }
 
-func (tr *Tree) Search(elements Element) Element {
+func (tr *Tree) Search(element Element) Element {
 	p := tr.root
 	for p != nil {
-		flag := elements.Compare(p.element)
+		flag := element.Compare(p.element)
 		if flag == -1 {
 			p = p.left
 		} else if flag == 1 {
@@ -63,9 +63,9 @@ func (tr *Tree) Search(elements Element) Element {
 	return nil
 }
 
-func (tr *Tree) Insert(elements Element) bool {
+func (tr *Tree) Insert(element Element) bool {
 	var n *Node
-	tr.root, n = tr.insert(tr.root, elements)
+	tr.root, n = tr.insert(tr.root, element)
 	if n == nil {
 		return false
 	}
@@ -73,9 +73,9 @@ func (tr *Tree) Insert(elements Element) bool {
 	return true
 }
 
-func (tr *Tree) Delete(elements Element) Element {
+func (tr *Tree) Delete(element Element) Element {
 	var d *Node
-	tr.root, d = tr.delete(tr.root, elements)
+	tr.root, d = tr.delete(tr.root, element)
 	if d == nil {
 		return nil
 	}
@@ -92,22 +92,22 @@ func (tr *Tree) Iter(start Element, boundary Element) container.Iterator {
 }
 
 // return (new root, new node)
-func (tr *Tree) insert(root *Node, elements Element) (*Node, *Node) {
+func (tr *Tree) insert(root *Node, element Element) (*Node, *Node) {
 	var n *Node
 
 	if root == nil {
-		n = tr.createNode(elements)
+		n = tr.createNode(element)
 		root = n
 	} else {
-		flag := elements.Compare(root.element)
+		flag := element.Compare(root.element)
 		if flag == -1 {
 			// insert into left subtree
-			root.left, n = tr.insert(root.left, elements)
+			root.left, n = tr.insert(root.left, element)
 		} else if flag == 1 {
 			// insert into right subtree
-			root.right, n = tr.insert(root.right, elements)
+			root.right, n = tr.insert(root.right, element)
 		} else {
-			// duplicate elements
+			// duplicate element
 			return root, nil
 		}
 		if n != nil {

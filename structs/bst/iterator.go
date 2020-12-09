@@ -38,11 +38,11 @@ func (it *Iterator) Next() Element {
 	}
 
 	p := it.s.Pop().(Node)
-	elements := p.Element()
+	element := p.Element()
 
 	fillStack(p.Right(), it.start, it.boundary, it.s)
 
-	return elements
+	return element
 }
 
 func fillStack(root Node, start Element, boundary Element, s *stack.Stack) {
