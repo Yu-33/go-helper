@@ -14,10 +14,10 @@ type Timer struct {
 	// The bucket that holds the list to which this timer's element belongs.
 	//
 	// NOTICE: This field may be updated and read concurrently,
-	// through Timer.Stop() and Bucket.Flush().
+	// through Timer.Close() and Bucket.flush().
 	b unsafe.Pointer // type: *bucket
 
-	// The timer's element.
+	// The timer's Element in list.
 	element *list.Element
 }
 
@@ -29,23 +29,19 @@ func (t *Timer) setBucket(b *bucket) {
 	atomic.StorePointer(&t.b, unsafe.Pointer(b))
 }
 
-// Stop prevents the Timer from firing. It returns true if the call
-// stops the timer, false if the timer has already expired or been stopped.
+// Close prevents the Timer from firing.
 //
-// If the timer t has already expired and the t.task has been started in its own
-// goroutine; Stop does not wait for t.task to complete before returning. If the caller
+// The func will be block until the timer has finally been removed from the TimeWheel.
+// But, if the timer t has already expired and the t.task has been started in its own
+// goroutine; Close does not wait for t.task to complete before returning. If the caller
 // needs to know whether t.task is completed, it must coordinate with t.task explicitly.
-func (t *Timer) Stop() bool {
-	stopped := false
+func (t *Timer) Close() {
 	for b := t.getBucket(); b != nil; b = t.getBucket() {
-		// If b.Remove is called just after the timing wheel's goroutine has:
-		//     1. removed t from b (through b.Flush -> b.remove)
-		//     2. moved t from b to another bucket ab (through b.Flush -> b.remove and ab.Add)
-		// this may fail to remove t due to the change of t's bucket.
-		stopped = b.delete(t)
-
-		// Thus, here we re-get t's possibly new bucket (nil for case 1, or ab (non-nil) for case 2),
-		// and retry until the bucket becomes nil, which indicates that t has finally been removed.
+		// The b.delete may fail if t's bucket has changed due to TimeWheel call the b.flush.
+		// Thus, we re-get t's possibly new bucket and retry until the bucket becomes nil or
+		// delete successful.
+		if ok := b.delete(t); ok {
+			break
+		}
 	}
-	return stopped
 }

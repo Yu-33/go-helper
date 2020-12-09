@@ -31,12 +31,12 @@ func BenchmarkTWTimer_StartStop(b *testing.B) {
 			b.ResetTimer()
 
 			for i := 0; i < b.N; i++ {
-				tw.AfterFunc(time.Second, func() {}).Stop()
+				tw.AfterFunc(time.Second, func() {}).Close()
 			}
 
 			b.StopTimer()
 			for i := 0; i < len(base); i++ {
-				base[i].Stop()
+				base[i].Close()
 			}
 		})
 	}

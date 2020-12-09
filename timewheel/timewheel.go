@@ -121,13 +121,11 @@ func (tw *TimeWheel) add(t *Timer) bool {
 // timer's task if it has been expired.
 func (tw *TimeWheel) submit(t *Timer) {
 	if !tw.add(t) {
-		// Like the standard time.AfterFunc (https://golang.org/pkg/time/#AfterFunc),
-		// always execute the timer's task in its own goroutine.
-		go t.task()
+		t.task()
 	}
 }
 
-// advance try to push the clock forward.
+// advance push the clock forward.
 func (tw *TimeWheel) advance(expiration int64) {
 	current := atomic.LoadInt64(&tw.current)
 	if expiration >= current+tw.tick {
@@ -142,14 +140,17 @@ func (tw *TimeWheel) advance(expiration int64) {
 	}
 }
 
+// process the expiration's bucket
+func (tw *TimeWheel) process(value dqueue.Value) {
+	b := value.(*bucket)
+	tw.advance(b.getExpiration())
+
+	b.flush(tw.submit)
+}
+
 // Start starts the current timing wheel.
 func (tw *TimeWheel) Start() {
-	tw.queue.Receive(func(value dqueue.Value) {
-		b := value.(*bucket)
-		tw.advance(b.getExpiration())
-
-		b.flush(tw.submit)
-	})
+	tw.queue.Receive(tw.process)
 }
 
 // Stop stops the current timing wheel.

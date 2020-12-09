@@ -4,12 +4,12 @@ import (
 	"time"
 )
 
-// Scheduler determines the execution plan of a task.
+// Scheduler represents the execution plan of a task.
 type Scheduler interface {
 	// Next returns the next execution time after the given (previous) time.
 	// It will return a zero time if no next time is scheduled.
 	Next(prev time.Time) (next time.Time)
-	// Run will be called when scheduler expired.
+	// Run will be called when schedule expired.
 	Run()
 }
 
@@ -23,7 +23,7 @@ type Scheduler interface {
 // restarting of the timer. The wait time for ensuring is short since the
 // gap is very small.
 //
-// Internally, ScheduleFunc will ask the first execution time (by calling
+// Internally, Schedule will ask the first execution time (by calling
 // s.Next()) initially, and create a timer if the execution time is non-zero.
 // Afterwards, it will ask the next execution time each time f is about to
 // be executed, and f will be called at the next execution time if the time
@@ -47,8 +47,13 @@ func (tw *TimeWheel) Schedule(sh Scheduler) (t *Timer) {
 			}
 
 			// Actually execute the task.
-			sh.Run()
+			//
+			// Like the standard time.AfterFunc (https://golang.org/pkg/time/#AfterFunc),
+			// always execute the timer's task in its own goroutine.
+			go sh.Run()
 		},
+		b:       nil,
+		element: nil,
 	}
 
 	tw.submit(t)
@@ -60,7 +65,13 @@ func (tw *TimeWheel) Schedule(sh Scheduler) (t *Timer) {
 func (tw *TimeWheel) AfterFunc(d time.Duration, f func()) *Timer {
 	t := &Timer{
 		expiration: time.Now().Add(d).UnixNano(),
-		task:       f,
+		task: func() {
+			// Like the standard time.AfterFunc (https://golang.org/pkg/time/#AfterFunc),
+			// always execute the timer's task in its own goroutine.
+			go f()
+		},
+		b:       nil,
+		element: nil,
 	}
 	tw.submit(t)
 	return t

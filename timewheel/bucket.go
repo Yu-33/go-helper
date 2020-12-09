@@ -6,11 +6,12 @@ import (
 	"sync/atomic"
 )
 
-// Each tick(time interval) has a bucket and the bucket store all timers belonging to this tick.
+// Each tick(time interval) have a bucket to store all timers(tasks) that belonging to this tick.
 type bucket struct {
 	expiration int64
-	mu         *sync.Mutex
 	timers     *list.List
+	mu         *sync.Mutex
+	flushMu    *sync.Mutex // represents whether the bucket is performing flush.
 }
 
 func (b *bucket) getExpiration() int64 {
@@ -21,66 +22,97 @@ func (b *bucket) setExpiration(expiration int64) bool {
 	return atomic.SwapInt64(&b.expiration, expiration) != expiration
 }
 
+// insert add t to the b.timers, it only called by tw.add.
 func (b *bucket) insert(t *Timer) {
 	b.mu.Lock()
-	defer b.mu.Unlock()
 
 	e := b.timers.PushBack(t)
-	t.element = e
 	t.setBucket(b)
+	t.element = e
+
+	b.mu.Unlock()
 }
 
+// delete remove t from the TimeWheel, it only called by t.Close().
+//
+// return true indicates t has been removed from TimeWheel.
+// return false indicates the bucket has changed and can't perform delete operations.
 func (b *bucket) delete(t *Timer) bool {
+	b.flushMu.Lock()
 	b.mu.Lock()
-	defer b.mu.Unlock()
-	return b.remove(t)
-}
 
-func (b *bucket) remove(t *Timer) bool {
+	ok := true
 	if t.getBucket() != b {
-		// If remove is called from t.Stop, and this happens just after the timing wheel's goroutine has:
-		//     1. removed t from b (through b.Flush -> b.remove)
-		//     2. moved t from b to another bucket ab (through b.Flush -> b.remove and ab.Add)
-		// then t.getBucket will return nil for case 1, or ab (non-nil) for case 2.
-		// In either case, the returned value does not equal to b.
-		return false
+		// If delete is called just after the TimeWheel's goroutine has under cases:
+		//   - moved t from the b to another non-nil bucket "ab" (through: tw.process -> b.flush -> tw.submit -> tw.add -> ab.insert)
+		//     and in the case, t.getBucket will return "ab".
+		//
+		// In either cases, the return value maybe does not equal to b.
+		// return false to make the caller to try again.
+		ok = false
+	} else if t.element == nil {
+		// If delete is called after following cases happens:
+		//   1. the timer t add by tw.AfterFunc.
+		//   2. the next time is zero in tw.Schedule.
+		// In either cases, the timer t not in TimeWheel and is nil (set by b.flush),
+		// and it can be considered as a successful deletion.
+	} else {
+		b.timers.Remove(t.element)
+		t.setBucket(nil)
+		t.element = nil
 	}
-	b.timers.Remove(t.element)
-	t.setBucket(nil)
-	t.element = nil
-	return true
+
+	b.mu.Unlock()
+	b.flushMu.Unlock()
+
+	return ok
 }
 
-func (b *bucket) flush(reinsert func(*Timer)) {
+func (b *bucket) flush(submit func(*Timer)) {
+	b.flushMu.Lock()
 	b.mu.Lock()
 
-	timers := make([]*Timer, 0, b.timers.Len())
-	for e := b.timers.Front(); e != nil; {
+	timers := b.timers
+	// Reset the times in bucket.
+	b.timers = list.New()
+	b.setExpiration(-1)
+
+	b.mu.Unlock()
+
+	// Re submit and remove the Timer from list.
+	for e := timers.Front(); e != nil; {
 		next := e.Next()
 
-		t := e.Value.(*Timer)
-		b.remove(t)
-		timers = append(timers, t)
+		v := timers.Remove(e)
+		t := v.(*Timer)
+
+		// The timer t may not re-enqueue in the following cases:
+		//   1. the timer add by tw.AfterFunc.
+		//   2. the next time is zero in tw.Schedule.
+		// Thus, set the t.element to nil before submit to prevents unexpected when call t.Close.
+		t.element = nil
+
+		submit(t)
 
 		e = next
 	}
-	b.mu.Unlock()
 
-	b.setExpiration(-1)
+	b.flushMu.Unlock()
+}
 
-	for i := 0; i < len(timers); i++ {
-		reinsert(timers[i])
+func newBucket() *bucket {
+	return &bucket{
+		expiration: -1,
+		timers:     list.New(),
+		mu:         new(sync.Mutex),
+		flushMu:    new(sync.Mutex),
 	}
 }
 
-func createBuckets(size int) []*bucket {
-	buckets := make([]*bucket, size)
-	for i := 0; i < size; i++ {
-		buckets[i] = &bucket{
-			expiration: -1,
-			mu:         new(sync.Mutex),
-			timers:     list.New(),
-		}
+func createBuckets(n int) []*bucket {
+	buckets := make([]*bucket, n)
+	for i := 0; i < n; i++ {
+		buckets[i] = newBucket()
 	}
 	return buckets
 }
