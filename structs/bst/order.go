@@ -6,12 +6,12 @@ import (
 	"github.com/Yu-33/gohelper/structs/stack"
 )
 
-func InOrder(node Node) []Element {
+func InOrder(node Node) []KV {
 	if node == nil {
 		return nil
 	}
 
-	result := make([]Element, 0)
+	var result []KV
 	s := stack.Default()
 	p := node
 
@@ -23,12 +23,13 @@ func InOrder(node Node) []Element {
 			p = p.Left()
 		} else {
 			p = s.Pop().(Node)
-			result = append(result, p.Element())
+			result = append(result, p)
 			p = p.Right()
 		}
 
 		i++
 	}
+
 	//for !s.Empty() || !reflect.ValueOf(p).IsNil() {
 	//	for !reflect.ValueOf(p).IsNil() {
 	//		s.Push(p)
@@ -37,7 +38,7 @@ func InOrder(node Node) []Element {
 	//
 	//	if !s.Empty() {
 	//		p = s.Pop().(Node)
-	//		result = append(result, p.Element())
+	//		result = append(result, p)
 	//		p = p.Right()
 	//	}
 	//}
@@ -45,18 +46,18 @@ func InOrder(node Node) []Element {
 	return result
 }
 
-func PreOrder(node Node) []Element {
+func PreOrder(node Node) []KV {
 	if node == nil {
 		return nil
 	}
 
-	result := make([]Element, 0)
+	var result []KV
 	s := stack.Default()
 	p := node
 
 	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
 		if !reflect.ValueOf(p).IsNil() {
-			result = append(result, p.Element())
+			result = append(result, p)
 			s.Push(p)
 			p = p.Left()
 		} else {
@@ -68,12 +69,12 @@ func PreOrder(node Node) []Element {
 	return result
 }
 
-func PostOrder(node Node) []Element {
+func PostOrder(node Node) []KV {
 	if node == nil {
 		return nil
 	}
 
-	result := make([]Element, 0)
+	var result []KV
 
 	var lastVisit Node
 
@@ -88,7 +89,7 @@ func PostOrder(node Node) []Element {
 	for !s.Empty() {
 		p = s.Pop().(Node)
 		if reflect.ValueOf(p.Right()).IsNil() || p.Right() == lastVisit {
-			result = append(result, p.Element())
+			result = append(result, p)
 			lastVisit = p
 		} else {
 			s.Push(p)

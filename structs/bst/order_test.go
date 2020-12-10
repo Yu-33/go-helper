@@ -1,7 +1,6 @@
 package bst
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -11,23 +10,20 @@ func TestInOrder(t *testing.T) {
 	tr := buildBSTree()
 
 	r1 := InOrder(tr.root)
-	fmt.Println(r1)
 
-	var f func(node *MockNode)
+	var f func(node *treeNode)
 
-	r2 := make([]Element, 0)
-	f = func(node *MockNode) {
+	var r2 []KV
+	f = func(node *treeNode) {
 		if node == nil {
 			return
 		}
 		f(node.left)
-		r2 = append(r2, node.element)
+		r2 = append(r2, node)
 		f(node.right)
 	}
 
 	f(tr.root)
-
-	fmt.Println(r2)
 
 	require.Equal(t, r1, r2)
 }
@@ -35,23 +31,20 @@ func TestInOrder(t *testing.T) {
 func TestPreOrder(t *testing.T) {
 	tr := buildBSTree()
 	r1 := PreOrder(tr.root)
-	fmt.Println(r1)
 
-	var f func(node *MockNode)
+	var f func(node *treeNode)
 
-	r2 := make([]Element, 0)
-	f = func(node *MockNode) {
+	var r2 []KV
+	f = func(node *treeNode) {
 		if node == nil {
 			return
 		}
-		r2 = append(r2, node.element)
+		r2 = append(r2, node)
 		f(node.left)
 		f(node.right)
 	}
 
 	f(tr.root)
-
-	fmt.Println(r2)
 
 	require.Equal(t, r1, r2)
 }
@@ -60,23 +53,20 @@ func TestPostOrder(t *testing.T) {
 	tr := buildBSTree()
 
 	r1 := PostOrder(tr.root)
-	fmt.Println(r1)
 
-	var f func(node *MockNode)
+	var f func(node *treeNode)
 
-	r2 := make([]Element, 0)
-	f = func(node *MockNode) {
+	var r2 []KV
+	f = func(node *treeNode) {
 		if node == nil {
 			return
 		}
 		f(node.left)
 		f(node.right)
-		r2 = append(r2, node.element)
+		r2 = append(r2, node)
 	}
 
 	f(tr.root)
-
-	fmt.Println(r2)
 
 	require.Equal(t, r1, r2)
 }

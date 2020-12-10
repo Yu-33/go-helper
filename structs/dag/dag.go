@@ -25,13 +25,16 @@ func (g *DAG) InDegreeToString() string {
 	s := "{ "
 	it1 := g.vertexes.Iter(nil, nil)
 	for it1.Valid() {
-		n1 := it1.Next().(*node)
-		s += fmt.Sprintf("%v: [ ", n1.vex)
+		kv1 := it1.Next()
+		n1 := kv1.Value().(*Node)
+		s += fmt.Sprintf("%v: [ ", kv1.Key())
 
 		it2 := n1.in.Iter(nil, nil)
 		for it2.Valid() {
-			n2 := it2.Next().(*node)
-			s += fmt.Sprintf("%v ", n2.vex)
+			kv2 := it2.Next()
+			n2 := kv2.Value().(*Node)
+			_ = n2
+			s += fmt.Sprintf("%v ", kv2.Key())
 		}
 		s += "] "
 	}
@@ -44,13 +47,16 @@ func (g *DAG) OutDegreeToString() string {
 	s := "{ "
 	it1 := g.vertexes.Iter(nil, nil)
 	for it1.Valid() {
-		n1 := it1.Next().(*node)
-		s += fmt.Sprintf("%v: [ ", n1.vex)
+		kv1 := it1.Next()
+		n1 := kv1.Value().(*Node)
+		s += fmt.Sprintf("%v: [ ", kv1.Key())
 
 		it2 := n1.out.Iter(nil, nil)
 		for it2.Valid() {
-			n2 := it2.Next().(*node)
-			s += fmt.Sprintf("%v ", n2.vex)
+			kv2 := it2.Next()
+			n2 := kv2.Value().(*Node)
+			_ = n2
+			s += fmt.Sprintf("%v ", kv2.Key())
 		}
 		s += "] "
 	}
@@ -59,9 +65,9 @@ func (g *DAG) OutDegreeToString() string {
 }
 
 // AddVertex add new vertex into DAG, return false if vertex already exists.
-func (g *DAG) AddVertex(vertex Vertex) bool {
-	n := &node{vex: vertex}
-	ok := g.vertexes.Insert(n)
+func (g *DAG) AddVertex(vertex Vertex, v Value) bool {
+	n := &Node{value: v}
+	ok := g.vertexes.Insert(vertex, n)
 	if !ok {
 		return false
 	}
@@ -72,19 +78,19 @@ func (g *DAG) AddVertex(vertex Vertex) bool {
 
 // DelVertex delete a vertex from DAG, return false if vertex not exists.
 func (g *DAG) DelVertex(vertex Vertex) bool {
-	n1 := g.vertexes.Delete(&node{vex: vertex})
-	if n1 == nil {
+	v1 := g.vertexes.Delete(vertex)
+	if v1 == nil {
 		return false
 	}
-	n1.(*node).in = nil
-	n1.(*node).out = nil
+	v1.(*Node).in = nil
+	v1.(*Node).out = nil
 
 	// Delete edge
 	it := g.vertexes.Iter(nil, nil)
 	for it.Valid() {
-		n2 := it.Next().(*node)
-		_ = n2.in.Delete(n1)
-		_ = n2.out.Delete(n1)
+		kv2 := it.Next()
+		_ = kv2.Value().(*Node).in.Delete(vertex)
+		_ = kv2.Value().(*Node).out.Delete(vertex)
 	}
 
 	return true
@@ -97,59 +103,60 @@ func (g *DAG) AddEdge(vertex, adjacency Vertex) bool {
 		return false
 	}
 
-	n1 := g.vertexes.Search(&node{vex: vertex})
-	n2 := g.vertexes.Search(&node{vex: adjacency})
-	if n1 == nil {
+	v1 := g.vertexes.Search(vertex)
+	if v1 == nil {
 		return false
 	}
-	if n2 == nil {
+	v2 := g.vertexes.Search(adjacency)
+	if v2 == nil {
 		return false
 	}
 
-	vex := n1.(*node)
-	adj := n2.(*node)
+	vex := v1.(*Node)
+	adj := v2.(*Node)
 
 	// check loop
 	s := stack.Default()
-	s.Push(adj)
+	s.Push([]interface{}{adjacency, adj})
 
 	for !s.Empty() {
-		n := s.Pop().(*node)
-		if n.Compare(vex) == 0 {
+		x := s.Pop().([]interface{})
+		k := x[0].(Vertex)
+		n := x[1].(*Node)
+
+		if k.Compare(vertex) == 0 {
 			return false
 		}
 
 		it := n.out.Iter(nil, nil)
 		for it.Valid() {
-			s.Push(it.Next().(*node))
+			kv3 := it.Next()
+			s.Push([]interface{}{kv3.Key(), kv3.Value()})
 		}
 	}
 
 	// add edge
-	_ = vex.out.Insert(adj)
-	_ = adj.in.Insert(vex)
+	_ = vex.out.Insert(adjacency, adj)
+	_ = adj.in.Insert(vertex, vex)
 
 	return true
 }
 
 // DelEdge delete edges from vertex to adjacency.
 func (g *DAG) DelEdge(vertex, adjacency Vertex) bool {
-	n1 := g.vertexes.Search(&node{vex: vertex})
-	if n1 == nil {
+	v1 := g.vertexes.Search(vertex)
+	if v1 == nil {
 		return false
 	}
-	n2 := g.vertexes.Search(&node{vex: adjacency})
-	if n2 == nil {
+	v2 := g.vertexes.Search(adjacency)
+	if v2 == nil {
 		return false
 	}
 
-	vex := n1.(*node)
-	adj := n2.(*node)
-
-	if v := vex.out.Delete(adj); v == nil {
+	if v := v1.(*Node).out.Delete(adjacency); v == nil {
 		return false
 	}
-	if v := adj.in.Delete(vex); v == nil {
+	if v := v2.(*Node).in.Delete(vertex); v == nil {
 		return false
 	}
 

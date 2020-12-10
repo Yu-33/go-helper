@@ -11,7 +11,7 @@ import (
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
-func recurseCalculateNodeHeight(n *Node) int {
+func recurseCalculateNodeHeight(n *treeNode) int {
 	if n == nil {
 		return 0
 	}
@@ -23,7 +23,7 @@ func recurseCalculateNodeHeight(n *Node) int {
 	return rh + 1
 }
 
-func checkBalance(t *testing.T, tr *Tree, n *Node) {
+func checkBalance(t *testing.T, tr *Tree, n *treeNode) {
 	if n == nil {
 		return
 	}
@@ -35,10 +35,10 @@ func checkBalance(t *testing.T, tr *Tree, n *Node) {
 	require.Equal(t, tr.nodeHeight(n), recurseCalculateNodeHeight(n))
 
 	if n.left != nil {
-		require.Equal(t, n.element.Compare(n.left.element), 1)
+		require.Equal(t, n.key.Compare(n.left.key), 1)
 	}
 	if n.right != nil {
-		require.Equal(t, n.element.Compare(n.right.element), -1)
+		require.Equal(t, n.key.Compare(n.right.key), -1)
 	}
 
 	lh := tr.nodeHeight(n.left)
@@ -62,9 +62,9 @@ func TestAVLTree_createNode(t *testing.T) {
 
 	el1 := container.Int64(0xf)
 
-	n1 := tr.createNode(el1)
+	n1 := tr.createNode(el1, 1024)
 	require.NotNil(t, n1)
-	require.Equal(t, n1.element.Compare(el1), 0)
+	require.Equal(t, n1.key.Compare(el1), 0)
 	require.Equal(t, n1.height, 1)
 	require.Nil(t, n1.left)
 	require.Nil(t, n1.right)
@@ -84,7 +84,8 @@ func TestAVLTree(t *testing.T) {
 		for i := 0; i < length; i++ {
 			for {
 				k := container.Int64(r.Intn(maxKey) + 1)
-				if ok := tr.Insert(k); ok {
+				if ok := tr.Insert(k, int64(k*2+1)); ok {
+					require.False(t, tr.Insert(k, int64(k*2+1)))
 					keys[i] = k
 					break
 				}
@@ -96,8 +97,8 @@ func TestAVLTree(t *testing.T) {
 
 		// boundary
 		for _, k := range []container.Int64{0, 0xfffffff} {
-			require.True(t, tr.Insert(k))
-			require.False(t, tr.Insert(k))
+			require.True(t, tr.Insert(k, k))
+			require.False(t, tr.Insert(k, k))
 			require.NotNil(t, tr.Search(k))
 			require.Equal(t, tr.Search(k), k)
 			require.NotNil(t, tr.Delete(k))
@@ -108,7 +109,7 @@ func TestAVLTree(t *testing.T) {
 		for i := 0; i < length; i++ {
 			n := tr.Search(keys[i])
 			require.NotNil(t, n, fmt.Sprintf("key %d not found", keys[i]))
-			require.Equal(t, n, keys[i])
+			require.Equal(t, n, int64(keys[i]*2+1))
 		}
 
 		// delete

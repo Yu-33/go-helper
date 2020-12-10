@@ -1,4 +1,4 @@
-package conv
+package gconv
 
 import (
 	"testing"

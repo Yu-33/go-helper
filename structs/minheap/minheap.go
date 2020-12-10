@@ -8,7 +8,7 @@ const (
 	defaultCapacity = 64
 )
 
-type Element = container.Comparer
+type Element = container.Comparator
 
 // MinHeap implements min heap and can used as priority queue.
 type MinHeap struct {

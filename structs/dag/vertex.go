@@ -4,15 +4,12 @@ import (
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
-type Vertex = container.Comparer
+type Vertex container.Comparator
+type Value container.Value
+type KV = container.KV
 
-type node struct {
-	vex Vertex
-	in  container.Container
-	out container.Container
-}
-
-func (k1 *node) Compare(target Vertex) int {
-	k2 := target.(*node).vex
-	return k1.vex.Compare(k2)
+type Node struct {
+	value Value
+	in    container.Container
+	out   container.Container
 }

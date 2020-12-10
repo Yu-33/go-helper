@@ -21,18 +21,20 @@ func TestDAG_AddVertex(t *testing.T) {
 
 	// Add vertex
 	for i := 0; i < len(vertexes); i++ {
-		require.True(t, g.AddVertex(vertexes[i]))
-		require.False(t, g.AddVertex(vertexes[i]))
+		require.True(t, g.AddVertex(vertexes[i], int64(vertexes[i]*2+1)))
+		require.False(t, g.AddVertex(vertexes[i], int64(vertexes[i]*2+1)))
 	}
 
 	// test internal element
 	it1 := g.vertexes.Iter(nil, nil)
 	for it1.Valid() {
-		element := it1.Next()
-		require.NotNil(t, element)
-		n, ok := element.(*node)
+		kv := it1.Next()
+		require.NotNil(t, kv)
+		require.NotNil(t, kv.Key())
+		require.NotNil(t, kv.Value())
+		n, ok := kv.Value().(*Node)
 		require.True(t, ok)
-		require.NotNil(t, n.vex)
+		require.NotNil(t, n.value)
 		require.NotNil(t, n.in)
 		require.NotNil(t, n.out)
 	}
@@ -44,7 +46,7 @@ func TestDAG_AddEdge(t *testing.T) {
 
 	// Test Add vertex
 	for i := 0; i < len(vertexes); i++ {
-		require.True(t, g.AddVertex(vertexes[i]))
+		require.True(t, g.AddVertex(vertexes[i], int64(vertexes[i]*2+1)))
 	}
 
 	// Test Add edge positive
@@ -86,7 +88,7 @@ func TestDAG_DelVertex(t *testing.T) {
 
 	// Test Add vertex
 	for i := 0; i < len(vertexes); i++ {
-		require.True(t, g.AddVertex(vertexes[i]))
+		require.True(t, g.AddVertex(vertexes[i], int64(vertexes[i]*2+1)))
 	}
 
 	// Test Add edge positive
@@ -118,16 +120,19 @@ func TestDAG_DelVertex(t *testing.T) {
 
 	it1 := g.vertexes.Iter(nil, nil)
 	for it1.Valid() {
-		n1 := it1.Next().(*node)
-		require.NotEqual(t, n1.vex, vertexes[3])
+		kv1 := it1.Next()
+		n1 := kv1.Value().(*Node)
+		require.NotEqual(t, kv1.Key(), vertexes[3])
 
 		it2 := n1.in.Iter(nil, nil)
 		for it2.Valid() {
-			require.NotEqual(t, it2.Next().(*node).vex, vertexes[3])
+			kv2 := it2.Next()
+			require.NotEqual(t, kv2.Key(), vertexes[3])
 		}
 		it3 := n1.out.Iter(nil, nil)
 		for it3.Valid() {
-			require.NotEqual(t, it3.Next().(*node).vex, vertexes[3])
+			kv3 := it3.Next()
+			require.NotEqual(t, kv3.Key(), vertexes[3])
 		}
 	}
 }
@@ -138,7 +143,7 @@ func TestDAG_DelEdge(t *testing.T) {
 
 	// Test Add vertex
 	for i := 0; i < len(vertexes); i++ {
-		require.True(t, g.AddVertex(vertexes[i]))
+		require.True(t, g.AddVertex(vertexes[i], int64(vertexes[i]*2+1)))
 	}
 
 	// Test Add edge positive
@@ -175,7 +180,7 @@ func TestDAG_IterTopo(t *testing.T) {
 
 	// Test Add vertex
 	for i := 0; i < len(vertexes); i++ {
-		require.True(t, g.AddVertex(vertexes[i]))
+		require.True(t, g.AddVertex(vertexes[i], int64(vertexes[i]*2+1)))
 	}
 
 	// Test Add edge positive
@@ -201,13 +206,48 @@ func TestDAG_IterTopo(t *testing.T) {
 
 	require.True(t, g.AddEdge(vertexes[7], vertexes[8]))
 
+	fmt.Println("g.OutDegreeToString():", g.OutDegreeToString())
+	fmt.Println("g.InDegreeToString():", g.InDegreeToString())
+
+	var kvs []KV
 	it := g.IterTopo()
 	require.True(t, it.Valid())
-	require.Equal(t, it.Next(), []container.Comparer{container.Int64(0)})
-	require.Equal(t, it.Next(), []container.Comparer{container.Int64(1)})
-	require.Equal(t, it.Next(), []container.Comparer{container.Int64(3)})
-	require.Equal(t, it.Next(), []container.Comparer{container.Int64(2), container.Int64(7)})
-	require.Equal(t, it.Next(), []container.Comparer{container.Int64(4), container.Int64(5), container.Int64(6)})
-	require.Equal(t, it.Next(), []container.Comparer{container.Int64(8)})
+
+	kvs = it.Next()
+	require.Equal(t, len(kvs), 1)
+	require.Equal(t, kvs[0].Key(), vertexes[0])
+	require.Equal(t, kvs[0].Value().(*Node).value, int64(vertexes[0]*2+1))
+
+	kvs = it.Next()
+	require.Equal(t, len(kvs), 1)
+	require.Equal(t, kvs[0].Key(), vertexes[1])
+	require.Equal(t, kvs[0].Value().(*Node).value, int64(vertexes[1]*2+1))
+
+	kvs = it.Next()
+	require.Equal(t, len(kvs), 1)
+	require.Equal(t, kvs[0].Key(), vertexes[3])
+	require.Equal(t, kvs[0].Value().(*Node).value, int64(vertexes[3]*2+1))
+
+	kvs = it.Next()
+	require.Equal(t, len(kvs), 2)
+	require.Equal(t, kvs[0].Key(), vertexes[2])
+	require.Equal(t, kvs[0].Value().(*Node).value, int64(vertexes[2]*2+1))
+	require.Equal(t, kvs[1].Key(), vertexes[7])
+	require.Equal(t, kvs[1].Value().(*Node).value, int64(vertexes[7]*2+1))
+
+	kvs = it.Next()
+	require.Equal(t, len(kvs), 3)
+	require.Equal(t, kvs[0].Key(), vertexes[4])
+	require.Equal(t, kvs[0].Value().(*Node).value, int64(vertexes[4]*2+1))
+	require.Equal(t, kvs[1].Key(), vertexes[5])
+	require.Equal(t, kvs[1].Value().(*Node).value, int64(vertexes[5]*2+1))
+	require.Equal(t, kvs[2].Key(), vertexes[6])
+	require.Equal(t, kvs[2].Value().(*Node).value, int64(vertexes[6]*2+1))
+
+	kvs = it.Next()
+	require.Equal(t, len(kvs), 1)
+	require.Equal(t, kvs[0].Key(), vertexes[8])
+	require.Equal(t, kvs[0].Value().(*Node).value, int64(vertexes[8]*2+1))
+
 	require.False(t, it.Valid())
 }

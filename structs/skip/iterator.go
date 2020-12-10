@@ -1,14 +1,20 @@
 package skip
 
+// Iterator used to get the specified range of data.
+// The range is start <= x < boundary, and we allowed the start or boundary is nil.
+//
+// And also implements interface container.Iterator.
 type Iterator struct {
-	node *Node
-	end  *Node
+	node *listNode
+	end  *listNode
 }
 
-func newIterator(sl *List, start Element, boundary Element) *Iterator {
-	var node, end *Node
+// creates an Iterator.
+func newIterator(sl *List, start Key, boundary Key) *Iterator {
+	var node, end *listNode
 
-	if !(start != nil && boundary != nil && start.Compare(boundary) == 1) {
+	// If both the start and boundary are not nil, the start should less than the boundary.
+	if !(start != nil && boundary != nil && start.Compare(boundary) != -1) {
 		if start == nil {
 			node = sl.head.next[0]
 		} else {
@@ -16,7 +22,7 @@ func newIterator(sl *List, start Element, boundary Element) *Iterator {
 		}
 
 		if boundary != nil {
-			end = sl.searchFirstGT(boundary)
+			end = sl.searchFirstGE(boundary)
 		}
 	}
 
@@ -27,6 +33,9 @@ func newIterator(sl *List, start Element, boundary Element) *Iterator {
 	return iter
 }
 
+// Valid represents whether have more elements.
+//
+// And also implements interface container.Iterator.
 func (iter *Iterator) Valid() bool {
 	if iter.node == nil || iter.node == iter.end {
 		return false
@@ -35,13 +44,17 @@ func (iter *Iterator) Valid() bool {
 	return true
 }
 
-func (iter *Iterator) Next() Element {
+// Next returns a k/v pair and moved the iterator to the next pair.
+// Returns nil if no more elements.
+//
+// And also implements interface container.Iterator.
+func (iter *Iterator) Next() KV {
 	if !iter.Valid() {
 		return nil
 	}
 
-	element := iter.node.element
+	n := iter.node
 	iter.node = iter.node.next[0]
 
-	return element
+	return n
 }

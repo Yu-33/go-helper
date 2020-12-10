@@ -6,32 +6,32 @@ import (
 	"github.com/Yu-33/gohelper/structs/stack"
 )
 
-// SearchRange search for elements in a specified range from and and boundary (start <= k <= boundary).
-func SearchRange(root Node, start Element, boundary Element) []Element {
+// SearchRange get the specified range of data.
+// The range is start <= x < boundary, and we allowed the start or boundary is nil.
+func SearchRange(root Node, start Key, boundary Key) []KV {
 	if root == nil {
 		return nil
 	}
 
-	var result []Element
+	var result []KV
 
 	s := stack.Default()
 	p := root
 	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
 		if !reflect.ValueOf(p).IsNil() {
-			if start != nil && p.Element().Compare(start) == -1 {
+			if start != nil && p.Key().Compare(start) == -1 {
 				p = p.Right()
 				continue
 			}
-			if boundary != nil && p.Element().Compare(boundary) == 1 {
+			if boundary != nil && p.Key().Compare(boundary) != -1 {
 				p = p.Left()
 				continue
 			}
-
 			s.Push(p)
 			p = p.Left()
 		} else {
 			p = s.Pop().(Node)
-			result = append(result, p.Element())
+			result = append(result, p)
 			p = p.Right()
 		}
 	}
@@ -40,7 +40,7 @@ func SearchRange(root Node, start Element, boundary Element) []Element {
 }
 
 // SearchLastLT search for the last node that less than the 'key'.
-func SearchLastLT(root Node, key Element) Element {
+func SearchLastLT(root Node, key Key) KV {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -49,7 +49,7 @@ func SearchLastLT(root Node, key Element) Element {
 
 	p := root
 	for !reflect.ValueOf(p).IsNil() {
-		flag := key.Compare(p.Element())
+		flag := key.Compare(p.Key())
 		if flag == 1 {
 			n = p
 			p = p.Right()
@@ -59,14 +59,14 @@ func SearchLastLT(root Node, key Element) Element {
 	}
 
 	if n != nil {
-		return n.Element()
+		return n
 	}
 
 	return nil
 }
 
 // SearchLastLE search for the last node that less than or equal to the 'key'.
-func SearchLastLE(root Node, key Element) Element {
+func SearchLastLE(root Node, key Key) KV {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -75,7 +75,7 @@ func SearchLastLE(root Node, key Element) Element {
 
 	p := root
 	for !reflect.ValueOf(p).IsNil() {
-		flag := key.Compare(p.Element())
+		flag := key.Compare(p.Key())
 		if flag == 1 {
 			n = p
 			p = p.Right()
@@ -88,14 +88,14 @@ func SearchLastLE(root Node, key Element) Element {
 	}
 
 	if n != nil {
-		return n.Element()
+		return n
 	}
 
 	return nil
 }
 
 // SearchFirstGT search for the first node that greater than to the 'key'.
-func SearchFirstGT(root Node, key Element) Element {
+func SearchFirstGT(root Node, key Key) KV {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -104,7 +104,7 @@ func SearchFirstGT(root Node, key Element) Element {
 
 	p := root
 	for !reflect.ValueOf(p).IsNil() {
-		flag := key.Compare(p.Element())
+		flag := key.Compare(p.Key())
 		if flag == -1 {
 			n = p
 			p = p.Left()
@@ -114,14 +114,14 @@ func SearchFirstGT(root Node, key Element) Element {
 	}
 
 	if n != nil {
-		return n.Element()
+		return n
 	}
 
 	return nil
 }
 
 // SearchFirstGE search for the first node that greater than or equal to the 'key'.
-func SearchFirstGE(root Node, key Element) Element {
+func SearchFirstGE(root Node, key Key) KV {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -130,7 +130,7 @@ func SearchFirstGE(root Node, key Element) Element {
 
 	p := root
 	for !reflect.ValueOf(p).IsNil() {
-		flag := key.Compare(p.Element())
+		flag := key.Compare(p.Key())
 		if flag == -1 {
 			n = p
 			p = p.Left()
@@ -143,7 +143,7 @@ func SearchFirstGE(root Node, key Element) Element {
 	}
 
 	if n != nil {
-		return n.Element()
+		return n
 	}
 
 	return nil

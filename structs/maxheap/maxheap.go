@@ -8,7 +8,7 @@ const (
 	defaultCapacity = 64
 )
 
-type Element = container.Comparer
+type Element = container.Comparator
 
 // MaxHeap implements max heap and can used as priority queue.
 type MaxHeap struct {

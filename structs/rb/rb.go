@@ -10,32 +10,47 @@ const (
 	black
 )
 
-type Element = container.Comparer
+type Key = container.Key
+type Value = container.Value
 
-// Node used in rb tree and implements bst.Node.
-type Node struct {
-	element Element
-	left    *Node
-	right   *Node
-	parent  *Node
-	color   int8
+// treeNode used in rb tree.
+// And also implements interface bst.Node and container.KV.
+type treeNode struct {
+	key    Key
+	value  Value
+	left   *treeNode
+	right  *treeNode
+	parent *treeNode
+	color  int8
 }
 
-func (n *Node) Element() Element {
-	return n.element
+// Implements interface container.KV.
+// Implements interface bst.Node.
+func (n *treeNode) Key() Key {
+	return n.key
 }
 
-func (n *Node) Left() bst.Node {
+// Implements interface container.KV.
+// Implements interface bst.Node.
+func (n *treeNode) Value() Value {
+	return n.value
+}
+
+// Implements interface bst.Node.
+func (n *treeNode) Left() bst.Node {
 	return n.left
 }
 
-func (n *Node) Right() bst.Node {
+// Implements interface bst.Node.
+func (n *treeNode) Right() bst.Node {
 	return n.right
 }
 
-// Tree implements data struct of red-black tree.
+// Tree implements the data struct of red-black tree.
+//
+// And also implements interface container.Container
 type Tree struct {
-	root *Node
+	root *treeNode
 	len  int
 }
 
@@ -53,48 +68,35 @@ func (tr *Tree) Len() int {
 	return tr.len
 }
 
-// Search search element in RB Tree, return nil if element not exists.
-func (tr *Tree) Search(element Element) Element {
+// Insert inserts the key with value in the container.
+// k and v must not be nil, otherwise it will crash.
+// Returns false if key already exists.
+func (tr *Tree) Insert(k Key, v Value) bool {
+	var n *treeNode
 	p := tr.root
 	for p != nil {
-		flag := element.Compare(p.element)
-		if flag == -1 {
-			p = p.left
-		} else if flag == 1 {
-			p = p.right
-		} else {
-			return p.element
-		}
-	}
-	return nil
-}
-
-// Insert insert an element into RB Tree, return false if have duplicate element.
-func (tr *Tree) Insert(element Element) bool {
-	var n *Node
-	p := tr.root
-	for p != nil {
-		flag := element.Compare(p.element)
+		flag := k.Compare(p.key)
 		if flag == -1 {
 			if p.left == nil {
-				n = tr.createNode(element, p)
+				n = tr.createNode(k, v, p)
 				p.left = n
 				break
 			}
 			p = p.left
 		} else if flag == 1 {
 			if p.right == nil {
-				n = tr.createNode(element, p)
+				n = tr.createNode(k, v, p)
 				p.right = n
 				break
 			}
 			p = p.right
 		} else {
+			// The key already exists. Not allowed duplicates.
 			return false
 		}
 	}
 	if n == nil {
-		n = tr.createNode(element, p)
+		n = tr.createNode(k, v, p)
 	}
 
 	tr.insertBalance(n)
@@ -103,11 +105,12 @@ func (tr *Tree) Insert(element Element) bool {
 	return true
 }
 
-// Delete delete an element from RB Tree, return false if element not exists.
-func (tr *Tree) Delete(element Element) Element {
+// Delete remove and returns the value of the specified key.
+// Returns nil if not found.
+func (tr *Tree) Delete(k Key) Value {
 	d := tr.root
 	for d != nil {
-		flag := element.Compare(d.element)
+		flag := k.Compare(d.key)
 		if flag == -1 {
 			d = d.left
 		} else if flag == 1 {
@@ -125,12 +128,11 @@ func (tr *Tree) Delete(element Element) Element {
 		for x.right != nil {
 			x = x.right
 		}
-
-		d.element, x.element = x.element, d.element
+		tr.swap(d, x)
 		d = x
 	}
 
-	var c *Node
+	var c *treeNode
 
 	if d.left != nil {
 		c = d.left
@@ -155,17 +157,38 @@ func (tr *Tree) Delete(element Element) Element {
 	}
 
 	tr.len--
-	return d.element
+	return d.value
 }
 
-// Iter return a Iterator, include elements: start <= k <= boundary.
-// start == first node if start == nil and boundary == last node if boundary == nil.
-func (tr *Tree) Iter(start Element, boundary Element) container.Iterator {
+// Search get the value of specified key.
+// Returns nil if not found.
+func (tr *Tree) Search(k Key) Value {
+	p := tr.root
+	for p != nil {
+		flag := k.Compare(p.key)
+		if flag == -1 {
+			p = p.left
+		} else if flag == 1 {
+			p = p.right
+		} else {
+			return p.value
+		}
+	}
+	return nil
+}
+
+// Iter return a Iterator, it's a wraps for bst.Iterator.
+func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
 	it := bst.NewIterator(tr.root, start, boundary)
 	return it
 }
 
-func (tr *Tree) insertBalance(n *Node) {
+func (tr *Tree) swap(n1, n2 *treeNode) {
+	n1.key, n2.key = n2.key, n1.key
+	n1.value, n2.value = n2.value, n1.value
+}
+
+func (tr *Tree) insertBalance(n *treeNode) {
 	if n.parent == nil {
 		n.color = black
 		tr.root = n
@@ -176,7 +199,7 @@ func (tr *Tree) insertBalance(n *Node) {
 	}
 
 	var (
-		p, g, u *Node
+		p, g, u *treeNode
 	)
 
 	p = n.parent
@@ -215,7 +238,7 @@ func (tr *Tree) insertBalance(n *Node) {
 	}
 }
 
-func (tr *Tree) deleteBalance(n *Node, p *Node) {
+func (tr *Tree) deleteBalance(n *treeNode, p *treeNode) {
 	if n != nil && n.color == red {
 		n.color = black
 		return
@@ -226,7 +249,7 @@ func (tr *Tree) deleteBalance(n *Node, p *Node) {
 		return
 	}
 
-	var s *Node
+	var s *treeNode
 
 	if p.left == n {
 		s = p.right
@@ -281,17 +304,18 @@ func (tr *Tree) deleteBalance(n *Node, p *Node) {
 	}
 }
 
-func (tr *Tree) createNode(element Element, p *Node) *Node {
-	n := new(Node)
-	n.element = element
-	n.color = red
-	n.left = nil
-	n.right = nil
-	n.parent = p
-	return n
+func (tr *Tree) createNode(k Key, v Value, p *treeNode) *treeNode {
+	return &treeNode{
+		key:    k,
+		value:  v,
+		left:   nil,
+		right:  nil,
+		parent: p,
+		color:  red,
+	}
 }
 
-func (tr *Tree) leftRotate(n *Node) {
+func (tr *Tree) leftRotate(n *treeNode) {
 	r := n.right
 	if r.left != nil {
 		r.left.parent = n
@@ -312,7 +336,7 @@ func (tr *Tree) leftRotate(n *Node) {
 	}
 }
 
-func (tr *Tree) rightRotate(n *Node) {
+func (tr *Tree) rightRotate(n *treeNode) {
 	l := n.left
 	if l.right != nil {
 		l.right.parent = n

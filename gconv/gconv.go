@@ -1,18 +1,18 @@
-package conv
+package gconv
 
 import "unsafe"
 
-// BytesToString do unsafe convert byte array to string.
+// BytesToString converts bytes to string without memory copy.
 //
-// NOTICE: any changed to b will affect s.
+// NOTICE: This operations is unsafe, any changed to b will affect s.
 func BytesToString(b []byte) (s string) {
 	s = *(*string)(unsafe.Pointer(&b))
 	return
 }
 
-// StringToBytes do unsafe convert string to byte array.
+// StringToBytes converts string to bytes without memory copy
 //
-// NOTICE: any changed to b will affect s.
+// NOTICE: This operations is unsafe, any changed to b will affect s.
 func StringToBytes(s string) (b []byte) {
 	// string's header, see https://golang.org/pkg/reflect/#StringHeader
 	sh := (*[2]uintptr)(unsafe.Pointer(&s))

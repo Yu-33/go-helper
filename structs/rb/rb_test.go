@@ -10,7 +10,7 @@ import (
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
-func calculateNodeHeight(n *Node) int {
+func calculateNodeHeight(n *treeNode) int {
 	if n == nil {
 		return 0
 	}
@@ -22,7 +22,7 @@ func calculateNodeHeight(n *Node) int {
 	return rh + 1
 }
 
-func checkBalance(t *testing.T, n *Node) {
+func checkBalance(t *testing.T, n *treeNode) {
 	if n == nil {
 		return
 	}
@@ -46,10 +46,10 @@ func checkBalance(t *testing.T, n *Node) {
 	}
 
 	if n.left != nil {
-		require.Equal(t, n.element.Compare(n.left.element), 1)
+		require.Equal(t, n.key.Compare(n.left.key), 1)
 	}
 	if n.right != nil {
-		require.Equal(t, n.element.Compare(n.right.element), -1)
+		require.Equal(t, n.key.Compare(n.right.key), -1)
 	}
 
 	lh := calculateNodeHeight(n.left)
@@ -72,18 +72,20 @@ func TestRBTree_createNode(t *testing.T) {
 	tr := New()
 
 	ele1 := container.Int64(1)
-	n1 := tr.createNode(ele1, nil)
+	n1 := tr.createNode(ele1, 1024, nil)
 	require.NotNil(t, n1)
-	require.Equal(t, n1.element, ele1)
+	require.Equal(t, n1.key, ele1)
+	require.Equal(t, n1.value, 1024)
 	require.Equal(t, n1.color, red)
 	require.Nil(t, n1.left)
 	require.Nil(t, n1.right)
 	require.Nil(t, n1.parent)
 
 	ele2 := container.Int64(2)
-	n2 := tr.createNode(ele2, n1)
+	n2 := tr.createNode(ele2, 1024, n1)
 	require.NotNil(t, n2)
-	require.Equal(t, n2.element, ele2)
+	require.Equal(t, n2.key, ele2)
+	require.Equal(t, n2.value, 1024)
 	require.Equal(t, n2.color, red)
 	require.Nil(t, n2.left)
 	require.Nil(t, n2.right)
@@ -103,7 +105,8 @@ func TestRBTree(t *testing.T) {
 	for i := 0; i < length; i++ {
 		for {
 			k := container.Int64(r.Intn(maxKey) + 1)
-			if ok := tr.Insert(k); ok {
+			if ok := tr.Insert(k, int64(k*2+1)); ok {
+				require.False(t, tr.Insert(k, int64(k*2+1)))
 				keys[i] = k
 				break
 			}
@@ -117,8 +120,8 @@ func TestRBTree(t *testing.T) {
 
 	// boundary
 	for _, k := range []container.Int64{0, 0xfffffff} {
-		require.True(t, tr.Insert(k))
-		require.False(t, tr.Insert(k))
+		require.True(t, tr.Insert(k, k))
+		require.False(t, tr.Insert(k, k))
 		require.NotNil(t, tr.Search(k))
 		require.Equal(t, tr.Search(k), k)
 		require.NotNil(t, tr.Delete(k))
@@ -127,9 +130,9 @@ func TestRBTree(t *testing.T) {
 
 	// search
 	for i := 0; i < length; i++ {
-		element := tr.Search(keys[i])
-		require.NotNil(t, element)
-		require.Equal(t, element.Compare(keys[i]), 0)
+		v := tr.Search(keys[i])
+		require.NotNil(t, v)
+		require.Equal(t, v, int64(keys[i]*2+1))
 	}
 
 	// delete

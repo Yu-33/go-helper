@@ -2,73 +2,125 @@ package bst
 
 import (
 	"math/rand"
+	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
-type MockNode struct {
-	element Element
-	left    *MockNode
-	right   *MockNode
+func checkCorrect(t *testing.T, n *treeNode) {
+	if n == nil {
+		return
+	}
+	checkCorrect(t, n.left)
+	checkCorrect(t, n.right)
+
+	if n.left != nil {
+		require.Equal(t, n.key.Compare(n.left.key), 1)
+	}
+	if n.right != nil {
+		require.Equal(t, n.key.Compare(n.right.key), -1)
+	}
 }
 
-func (n *MockNode) Element() Element {
-	return n.element
+func TestNew(t *testing.T) {
+	tr := New()
+	require.NotNil(t, tr)
+	require.Nil(t, tr.root)
+	require.Equal(t, tr.Len(), 0)
 }
 
-func (n *MockNode) Left() Node {
-	return n.left
-}
+func TestTree(t *testing.T) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-func (n *MockNode) Right() Node {
-	return n.right
-}
+	tr := New()
 
-type MockTree struct {
-	root *MockNode
-}
+	length := 65
+	maxKey := length * 10
+	keys := make([]container.Int, length)
 
-func (tr *MockTree) Insert(element Element) bool {
-	p := tr.root
-	for p != nil {
-		flag := element.Compare(p.element)
-		if flag == -1 {
-			if p.left == nil {
-				p.left = &MockNode{element: element}
-				break
+	for x := 0; x < 2; x++ {
+		// insert
+		for i := 0; i < length; i++ {
+			for {
+				k := container.Int(r.Intn(maxKey) + 1)
+				if ok := tr.Insert(k, int64(k*2+1)); ok {
+					require.False(t, tr.Insert(k, int64(k*2+1)))
+					keys[i] = k
+					break
+				}
 			}
-			p = p.left
-		} else if flag == 1 {
-			if p.right == nil {
-				p.right = &MockNode{element: element}
-				break
-			}
-			p = p.right
-		} else {
-			return false
+			checkCorrect(t, tr.root)
 		}
-	}
 
-	if p == nil {
-		tr.root = &MockNode{element: element}
-	}
+		require.Equal(t, length, tr.len)
 
-	return true
+		// search
+		for i := 0; i < length; i++ {
+			v := tr.Search(keys[i])
+			require.NotNil(t, v)
+			require.Equal(t, v, int64(keys[i]*2+1))
+		}
+
+		// delete
+		for i := 0; i < length; i++ {
+			require.NotNil(t, tr.Delete(keys[i]))
+			require.Nil(t, tr.Delete(keys[i]))
+			checkCorrect(t, tr.root)
+		}
+
+		require.Nil(t, tr.root)
+		require.Equal(t, 0, tr.Len())
+	}
 }
 
-func buildBSTree() (tr *MockTree) {
+func TestTree_Len(t *testing.T) {
+	tr := New()
+
+	require.True(t, tr.Insert(container.Int(12), 1))
+	require.True(t, tr.Insert(container.Int(18), 1))
+	require.True(t, tr.Insert(container.Int(33), 1))
+
+	// Insert duplicate key.
+	require.False(t, tr.Insert(container.Int(12), 1))
+	require.False(t, tr.Insert(container.Int(18), 1))
+	require.False(t, tr.Insert(container.Int(33), 1))
+
+	require.Equal(t, tr.Len(), 3)
+
+	require.NotNil(t, tr.Delete(container.Int(18)))
+	// Delete key not exists.
+	require.Nil(t, tr.Delete(container.Int(18)))
+
+	require.Equal(t, tr.Len(), 2)
+}
+
+func TestAVLTree_createNode(t *testing.T) {
+	tr := New()
+
+	el1 := container.Int64(0xf)
+
+	n1 := tr.createNode(el1, 1024)
+	require.NotNil(t, n1)
+	require.Equal(t, n1.key.Compare(el1), 0)
+	require.Nil(t, n1.left)
+	require.Nil(t, n1.right)
+}
+
+func buildBSTree() (tr *Tree) {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	length := 25
 	maxKey := length * 10
 
-	tr = &MockTree{}
+	tr = New()
 
 	for i := 0; i < length; i++ {
 		for {
 			k := container.Int64(r.Intn(maxKey) + 1)
-			if ok := tr.Insert(k); ok {
+			if ok := tr.Insert(k, k*2+1); ok {
 				break
 			}
 		}

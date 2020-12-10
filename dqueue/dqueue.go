@@ -22,8 +22,8 @@ type Item struct {
 	Value      Value
 }
 
-// Implements container.Comparer.
-func (k1 *Item) Compare(target container.Comparer) int {
+// Implements container.Comparator.
+func (k1 *Item) Compare(target container.Comparator) int {
 	k2 := target.(*Item)
 	if k1.Expiration < k2.Expiration {
 		return -1

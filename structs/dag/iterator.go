@@ -7,23 +7,24 @@ import (
 // IterTopo implements Iterator by Topology algo.
 type IterTopo struct {
 	q         *queue.Queue
-	inDegrees map[*node]int
+	inDegrees map[Vertex]int
 }
 
 func newIterTopo(g *DAG) *IterTopo {
 	q := queue.Default()
 
-	inDegrees := make(map[*node]int)
+	inDegrees := make(map[Vertex]int)
 
 	vexIt := g.vertexes.Iter(nil, nil)
 	for vexIt.Valid() {
-		n := vexIt.Next().(*node)
-		inDegrees[n] = n.in.Len()
-	}
+		kv := vexIt.Next()
+		degree := kv.Value().(*Node).in.Len()
 
-	for n, degree := range inDegrees {
+		inDegrees[kv.Key()] = degree
+
+		// Add the vertex with zero degree into the queue.
 		if degree == 0 {
-			q.Push(n)
+			q.Push(kv)
 		}
 	}
 
@@ -38,27 +39,25 @@ func (it *IterTopo) Valid() bool {
 	return !it.q.Empty()
 }
 
-func (it *IterTopo) Next() []Vertex {
+// FIXME:
+func (it *IterTopo) Next() []KV {
 	if !it.Valid() {
 		return nil
 	}
-
-	vertexes := make([]Vertex, 0, it.q.Len())
-	nodes := make([]*node, 0, it.q.Len())
+	vertexes := make([]KV, 0, it.q.Len())
 
 	for !it.q.Empty() {
-		n := it.q.Pop().(*node)
-		vertexes = append(vertexes, n.vex)
-		nodes = append(nodes, n)
+		kv := it.q.Pop().(KV)
+		vertexes = append(vertexes, kv)
 	}
 
-	for i := range nodes {
-		itOut := nodes[i].out.Iter(nil, nil)
+	for i := range vertexes {
+		itOut := vertexes[i].Value().(*Node).out.Iter(nil, nil)
 		for itOut.Valid() {
-			n := itOut.Next().(*node)
-			it.inDegrees[n]--
-			if it.inDegrees[n] == 0 {
-				it.q.Push(n)
+			kv := itOut.Next()
+			it.inDegrees[kv.Key()]--
+			if it.inDegrees[kv.Key()] == 0 {
+				it.q.Push(kv)
 			}
 		}
 	}
