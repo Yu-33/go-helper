@@ -86,19 +86,19 @@ func TestList_createNode(t *testing.T) {
 func TestList_Insert(t *testing.T) {
 	sl := New()
 
-	require.True(t, sl.Insert(container.Int(11), 1024))
-	require.False(t, sl.Insert(container.Int(11), 1023))
-	require.True(t, sl.Insert(container.Int(33), nil))
-	require.False(t, sl.Insert(container.Int(33), nil))
-	require.True(t, sl.Insert(container.Int(22), nil))
-	require.False(t, sl.Insert(container.Int(22), nil))
+	require.NotNil(t, sl.Insert(container.Int(11), 1024))
+	require.Nil(t, sl.Insert(container.Int(11), 1023))
+	require.NotNil(t, sl.Insert(container.Int(33), nil))
+	require.Nil(t, sl.Insert(container.Int(33), nil))
+	require.NotNil(t, sl.Insert(container.Int(22), nil))
+	require.Nil(t, sl.Insert(container.Int(22), nil))
 }
 
 func TestList_Delete(t *testing.T) {
 	sl := New()
-	require.True(t, sl.Insert(container.Int(11), 1021))
-	require.True(t, sl.Insert(container.Int(22), 1022))
-	require.True(t, sl.Insert(container.Int(33), 1023))
+	require.NotNil(t, sl.Insert(container.Int(11), 1021))
+	require.NotNil(t, sl.Insert(container.Int(22), 1022))
+	require.NotNil(t, sl.Insert(container.Int(33), 1023))
 
 	kv := sl.Delete(container.Int(11))
 	require.NotNil(t, kv)
@@ -118,9 +118,9 @@ func TestList_Delete(t *testing.T) {
 
 func TestList_Search(t *testing.T) {
 	sl := New()
-	require.True(t, sl.Insert(container.Int(11), 1021))
-	require.True(t, sl.Insert(container.Int(22), 1022))
-	require.True(t, sl.Insert(container.Int(33), 1023))
+	require.NotNil(t, sl.Insert(container.Int(11), 1021))
+	require.NotNil(t, sl.Insert(container.Int(22), 1022))
+	require.NotNil(t, sl.Insert(container.Int(33), 1023))
 
 	require.Equal(t, sl.Search(container.Int(11)).Key().Compare(container.Int(11)), 0)
 	require.Equal(t, sl.Search(container.Int(11)).Value(), 1021)
@@ -147,8 +147,8 @@ func TestList(t *testing.T) {
 		for i := 0; i < length; i++ {
 			for {
 				k := container.Int64(r.Intn(maxKey) + 1)
-				if ok := sl.Insert(k, int64(k*2+1)); ok {
-					require.False(t, sl.Insert(k, int64(k*2+1)))
+				if sl.Insert(k, int64(k*2+1)) != nil {
+					require.Nil(t, sl.Insert(k, int64(k*2+1)))
 					keys[i] = k
 					break
 				}
@@ -162,8 +162,8 @@ func TestList(t *testing.T) {
 
 		// boundary
 		for _, k := range []container.Int64{0, 0xfffffff} {
-			require.True(t, sl.Insert(k, k))
-			require.False(t, sl.Insert(k, k))
+			require.NotNil(t, sl.Insert(k, k))
+			require.Nil(t, sl.Insert(k, k))
 			require.NotNil(t, sl.Search(k))
 			require.Equal(t, sl.Search(k).Value(), k)
 			require.NotNil(t, sl.Delete(k))

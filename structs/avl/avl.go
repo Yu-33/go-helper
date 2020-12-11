@@ -66,16 +66,16 @@ func (tr *Tree) Len() int {
 	return tr.len
 }
 
-// Insert inserts the giving key and value.
-// Returns false if key already exists.
-func (tr *Tree) Insert(k Key, v Value) bool {
+// Insert inserts the giving key and value and returns the KV structure.
+// Returns nil if key already exists.
+func (tr *Tree) Insert(k Key, v Value) KV {
 	var n *treeNode
 	tr.root, n = tr.insert(tr.root, k, v)
 	if n == nil {
-		return false
+		return nil
 	}
 	tr.len++
-	return true
+	return n
 }
 
 // Delete removes and returns the KV structure corresponding to the given key.

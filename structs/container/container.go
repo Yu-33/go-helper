@@ -19,9 +19,9 @@ type Container interface {
 	// Len returns the number of elements.
 	Len() int
 
-	// Insert inserts the giving key and value.
-	// Returns false if key already exists.
-	Insert(k Key, v Value) bool
+	// Insert inserts the giving key and value and returns the KV structure.
+	// Returns nil if key already exists.
+	Insert(k Key, v Value) (kv KV)
 
 	// Delete removes and returns the KV structure corresponding to the given key.
 	// Returns nil if not found.

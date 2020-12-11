@@ -59,9 +59,9 @@ func (sl *List) Len() int {
 	return sl.lens[0]
 }
 
-// Insert inserts the giving key and value.
-// Returns false if key already exists.
-func (sl *List) Insert(k Key, v Value) bool {
+// Insert inserts the giving key and value and returns the KV structure.
+// Returns nil if key already exists.
+func (sl *List) Insert(k Key, v Value) KV {
 	var updates [maxLevel + 1]*listNode
 
 	level := sl.chooseLevel()
@@ -76,7 +76,7 @@ func (sl *List) Insert(k Key, v Value) bool {
 		}
 		if p.next[i] != nil && p.next[i].key.Compare(k) == 0 {
 			// The key already exists. Not allowed duplicates.
-			return false
+			return nil
 		}
 		updates[i] = p
 	}
@@ -88,7 +88,7 @@ func (sl *List) Insert(k Key, v Value) bool {
 		sl.lens[i]++
 	}
 
-	return true
+	return node
 }
 
 // Delete removes and returns the KV structure corresponding to the given key.

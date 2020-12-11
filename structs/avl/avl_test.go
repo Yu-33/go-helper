@@ -93,19 +93,19 @@ func TestTree_createNode(t *testing.T) {
 func TestTree_Insert(t *testing.T) {
 	tr := New()
 
-	require.True(t, tr.Insert(container.Int(11), 1024))
-	require.False(t, tr.Insert(container.Int(11), 1023))
-	require.True(t, tr.Insert(container.Int(33), nil))
-	require.False(t, tr.Insert(container.Int(33), nil))
-	require.True(t, tr.Insert(container.Int(22), nil))
-	require.False(t, tr.Insert(container.Int(22), nil))
+	require.NotNil(t, tr.Insert(container.Int(11), 1024))
+	require.Nil(t, tr.Insert(container.Int(11), 1023))
+	require.NotNil(t, tr.Insert(container.Int(33), nil))
+	require.Nil(t, tr.Insert(container.Int(33), nil))
+	require.NotNil(t, tr.Insert(container.Int(22), nil))
+	require.Nil(t, tr.Insert(container.Int(22), nil))
 }
 
 func TestTree_Delete(t *testing.T) {
 	tr := New()
-	require.True(t, tr.Insert(container.Int(11), 1021))
-	require.True(t, tr.Insert(container.Int(22), 1022))
-	require.True(t, tr.Insert(container.Int(33), 1023))
+	require.NotNil(t, tr.Insert(container.Int(11), 1021))
+	require.NotNil(t, tr.Insert(container.Int(22), 1022))
+	require.NotNil(t, tr.Insert(container.Int(33), 1023))
 
 	kv := tr.Delete(container.Int(11))
 	require.NotNil(t, kv)
@@ -129,9 +129,9 @@ func TestTree_Delete(t *testing.T) {
 
 func TestTree_Search(t *testing.T) {
 	tr := New()
-	require.True(t, tr.Insert(container.Int(11), 1021))
-	require.True(t, tr.Insert(container.Int(22), 1022))
-	require.True(t, tr.Insert(container.Int(33), 1023))
+	require.NotNil(t, tr.Insert(container.Int(11), 1021))
+	require.NotNil(t, tr.Insert(container.Int(22), 1022))
+	require.NotNil(t, tr.Insert(container.Int(33), 1023))
 
 	require.Equal(t, tr.Search(container.Int(11)).Key().Compare(container.Int(11)), 0)
 	require.Equal(t, tr.Search(container.Int(11)).Value(), 1021)
@@ -147,14 +147,14 @@ func TestTree_Search(t *testing.T) {
 func TestTree_Len(t *testing.T) {
 	tr := New()
 
-	require.True(t, tr.Insert(container.Int(12), 1))
-	require.True(t, tr.Insert(container.Int(18), 1))
-	require.True(t, tr.Insert(container.Int(33), 1))
+	require.NotNil(t, tr.Insert(container.Int(12), 1))
+	require.NotNil(t, tr.Insert(container.Int(18), 1))
+	require.NotNil(t, tr.Insert(container.Int(33), 1))
 
 	// Insert duplicate key.
-	require.False(t, tr.Insert(container.Int(12), 1))
-	require.False(t, tr.Insert(container.Int(18), 1))
-	require.False(t, tr.Insert(container.Int(33), 1))
+	require.Nil(t, tr.Insert(container.Int(12), 1))
+	require.Nil(t, tr.Insert(container.Int(18), 1))
+	require.Nil(t, tr.Insert(container.Int(33), 1))
 
 	require.Equal(t, tr.Len(), 3)
 
@@ -181,8 +181,8 @@ func TestTree(t *testing.T) {
 		for i := 0; i < length; i++ {
 			for {
 				k := container.Int(r.Intn(maxKey) + 1)
-				if ok := tr.Insert(k, int64(k*2+1)); ok {
-					require.False(t, tr.Insert(k, int64(k*2+1)))
+				if tr.Insert(k, int64(k*2+1)) != nil {
+					require.Nil(t, tr.Insert(k, int64(k*2+1)))
 					keys[i] = k
 					break
 				}
@@ -195,8 +195,8 @@ func TestTree(t *testing.T) {
 
 		// boundary
 		for _, k := range []container.Int{0, 0xfffffff} {
-			require.True(t, tr.Insert(k, k))
-			require.False(t, tr.Insert(k, k))
+			require.NotNil(t, tr.Insert(k, k))
+			require.Nil(t, tr.Insert(k, k))
 			require.NotNil(t, tr.Search(k))
 			require.Equal(t, tr.Search(k).Value(), k)
 			require.NotNil(t, tr.Delete(k))

@@ -27,10 +27,10 @@ func (g *DAG) Len() int {
 // Returns false if vertex already exists.
 func (g *DAG) AddVertex(k Key, v Value) bool {
 	vex := &Vertex{key: k, value: v}
-	ok := g.vertexes.Insert(k, vex)
-	if !ok {
+	if g.vertexes.Insert(k, vex) == nil {
 		return false
 	}
+
 	vex.in = rb.New()
 	vex.out = rb.New()
 	return true
