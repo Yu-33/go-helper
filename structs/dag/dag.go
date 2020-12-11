@@ -1,8 +1,6 @@
 package dag
 
 import (
-	"fmt"
-
 	"github.com/Yu-33/gohelper/structs/container"
 	"github.com/Yu-33/gohelper/structs/rb"
 	"github.com/Yu-33/gohelper/structs/stack"
@@ -20,143 +18,132 @@ func New() *DAG {
 	return g
 }
 
-// InDegreeToString return strings by in-degree.
-func (g *DAG) InDegreeToString() string {
-	s := "{ "
-	it1 := g.vertexes.Iter(nil, nil)
-	for it1.Valid() {
-		kv1 := it1.Next()
-		n1 := kv1.Value().(*Node)
-		s += fmt.Sprintf("%v: [ ", kv1.Key())
-
-		it2 := n1.in.Iter(nil, nil)
-		for it2.Valid() {
-			kv2 := it2.Next()
-			n2 := kv2.Value().(*Node)
-			_ = n2
-			s += fmt.Sprintf("%v ", kv2.Key())
-		}
-		s += "] "
-	}
-	s += "}"
-	return s
+// Len returns number of vertex in DAG.
+func (g *DAG) Len() int {
+	return g.vertexes.Len()
 }
 
-// OutDegreeToString return strings by out-degree.
-func (g *DAG) OutDegreeToString() string {
-	s := "{ "
-	it1 := g.vertexes.Iter(nil, nil)
-	for it1.Valid() {
-		kv1 := it1.Next()
-		n1 := kv1.Value().(*Node)
-		s += fmt.Sprintf("%v: [ ", kv1.Key())
-
-		it2 := n1.out.Iter(nil, nil)
-		for it2.Valid() {
-			kv2 := it2.Next()
-			n2 := kv2.Value().(*Node)
-			_ = n2
-			s += fmt.Sprintf("%v ", kv2.Key())
-		}
-		s += "] "
-	}
-	s += "}"
-	return s
-}
-
-// AddVertex add new vertex into DAG, return false if vertex already exists.
-func (g *DAG) AddVertex(vertex Vertex, v Value) bool {
-	n := &Node{value: v}
-	ok := g.vertexes.Insert(vertex, n)
+// AddVertex adds new vertex with k/v to DAG.
+// Returns false if vertex already exists.
+func (g *DAG) AddVertex(k Key, v Value) bool {
+	vex := &Vertex{key: k, value: v}
+	ok := g.vertexes.Insert(k, vex)
 	if !ok {
 		return false
 	}
-	n.in = rb.New()
-	n.out = rb.New()
+	vex.in = rb.New()
+	vex.out = rb.New()
 	return true
 }
 
-// DelVertex delete a vertex from DAG, return false if vertex not exists.
-func (g *DAG) DelVertex(vertex Vertex) bool {
-	v1 := g.vertexes.Delete(vertex)
-	if v1 == nil {
-		return false
+// DelVertex removes the vertex by giving key and returns its value.
+// Returns nil if vertex not exists.
+func (g *DAG) DelVertex(k Key) Value {
+	v := g.vertexes.Delete(k)
+	if v == nil {
+		return nil
 	}
-	v1.(*Node).in = nil
-	v1.(*Node).out = nil
 
-	// Delete edge
+	n := v.(*Vertex)
+	n.in = nil
+	n.out = nil
+
+	// Delete edges form other vertices that attach to this vertex.
 	it := g.vertexes.Iter(nil, nil)
 	for it.Valid() {
-		kv2 := it.Next()
-		_ = kv2.Value().(*Node).in.Delete(vertex)
-		_ = kv2.Value().(*Node).out.Delete(vertex)
+		kv := it.Next()
+		n1 := kv.Value().(*Vertex)
+		_ = n1.in.Delete(k)
+		_ = n1.out.Delete(k)
 	}
 
-	return true
+	return n.value
 }
 
-// AddEdge add an edge from vertex to adjacency.
-// return false when There is a loop between vertex and adjacency.
-func (g *DAG) AddEdge(vertex, adjacency Vertex) bool {
-	if vertex.Compare(adjacency) == 0 {
-		return false
+// GetVertex get the value of a given key.
+func (g *DAG) GetVertex(k Key) Value {
+	v := g.vertexes.Search(k)
+	if v == nil {
+		return v
+	}
+	return v.(*Vertex).value
+}
+
+// AddEdge attaches an edge from vertex to adjacency.
+//
+// Returns false if there a ring between vertex and adjacency after attaching.
+//
+// And will be crashing in following cases:
+//   - vertex equal to adjacency.
+//   - vertex or adjacency does not exist.
+func (g *DAG) AddEdge(vex, adj Key) bool {
+	if vex.Compare(adj) == 0 {
+		panic("dag:AddEdge: vertex can not equal to adjacency")
 	}
 
-	v1 := g.vertexes.Search(vertex)
+	v1 := g.vertexes.Search(vex)
 	if v1 == nil {
-		return false
+		panic("dag:AddEdge: vertex not exists")
 	}
-	v2 := g.vertexes.Search(adjacency)
+	v2 := g.vertexes.Search(adj)
 	if v2 == nil {
-		return false
+		panic("dag:AddEdge: adjacency not exists")
 	}
 
-	vex := v1.(*Node)
-	adj := v2.(*Node)
+	n1 := v1.(*Vertex)
+	n2 := v2.(*Vertex)
 
-	// check loop
+	// Check whether has ring.
 	s := stack.Default()
-	s.Push([]interface{}{adjacency, adj})
+	s.Push([]interface{}{adj, n2})
 
 	for !s.Empty() {
 		x := s.Pop().([]interface{})
-		k := x[0].(Vertex)
-		n := x[1].(*Node)
+		k := x[0].(Key)
+		n := x[1].(*Vertex)
 
-		if k.Compare(vertex) == 0 {
+		if k.Compare(vex) == 0 {
 			return false
 		}
 
 		it := n.out.Iter(nil, nil)
 		for it.Valid() {
-			kv3 := it.Next()
-			s.Push([]interface{}{kv3.Key(), kv3.Value()})
+			kv := it.Next()
+			s.Push([]interface{}{kv.Key(), kv.Value()})
 		}
 	}
 
-	// add edge
-	_ = vex.out.Insert(adjacency, adj)
-	_ = adj.in.Insert(vertex, vex)
+	// Attach edges
+	// FIXME: We needs check edges exists first ?
+	_ = n1.out.Insert(adj, n2)
+	_ = n2.in.Insert(vex, n1)
 
 	return true
 }
 
-// DelEdge delete edges from vertex to adjacency.
-func (g *DAG) DelEdge(vertex, adjacency Vertex) bool {
-	v1 := g.vertexes.Search(vertex)
-	if v1 == nil {
-		return false
-	}
-	v2 := g.vertexes.Search(adjacency)
-	if v2 == nil {
-		return false
+// DelEdge detaches edges from vertex to adjacency.
+//
+// And will be crashing in following cases:
+//   - vertex equal to adjacency.
+//   - vertex or adjacency does not exist.
+func (g *DAG) DelEdge(vex, adj Key) bool {
+	if vex.Compare(adj) == 0 {
+		panic("dag:DelEdge: vertex can not equal to adjacency")
 	}
 
-	if v := v1.(*Node).out.Delete(adjacency); v == nil {
+	v1 := g.vertexes.Search(vex)
+	if v1 == nil {
+		panic("dag:DelEdge: vertex not exists")
+	}
+	v2 := g.vertexes.Search(adj)
+	if v2 == nil {
+		panic("dag:DelEdge: adjacency not exists")
+	}
+
+	if v := v1.(*Vertex).out.Delete(adj); v == nil {
 		return false
 	}
-	if v := v2.(*Node).in.Delete(vertex); v == nil {
+	if v := v2.(*Vertex).in.Delete(vex); v == nil {
 		return false
 	}
 

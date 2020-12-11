@@ -4,12 +4,23 @@ import (
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
-type Vertex container.Comparator
-type Value container.Value
-type KV = container.KV
+type Key = container.Comparator
+type Value = container.Value
 
-type Node struct {
+// Vertex represents a vertex in DAG.
+type Vertex struct {
+	key   Key
 	value Value
-	in    container.Container
-	out   container.Container
+	out   container.Container // out-edge
+	in    container.Container // in-edge
+}
+
+// Returns the key of vertex.
+func (vex *Vertex) Key() Key {
+	return vex.key
+}
+
+// Returns the value of vertex.
+func (vex *Vertex) Value() Value {
+	return vex.value
 }

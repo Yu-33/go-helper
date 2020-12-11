@@ -15,28 +15,28 @@ const (
 	maxLevel = 0x1f
 )
 
-// listNode used in skip list and implements container.KV.
+// listNode is used for Skip List.
 //
-// And also implements interface container.KV.
+// And it is also the implementation of interface container.KV.
 type listNode struct {
 	key   Key
 	value Value
 	next  []*listNode
 }
 
-// Implements interface container.KV.
+// Key returns the key.
 func (n *listNode) Key() Key {
 	return n.key
 }
 
-// Implements interface container.KV.
+// Value returns the value.
 func (n *listNode) Value() Value {
 	return n.value
 }
 
-// List implements data struct of skip list.
+// List implements Skip List.
 //
-// And also implements interface container.Container
+// And it is also the implementation of interface container.Container
 type List struct {
 	head  *listNode
 	level int
@@ -44,7 +44,7 @@ type List struct {
 	r     *rand.Rand
 }
 
-// New creates an skip list.
+// New creates an List.
 func New() *List {
 	sl := new(List)
 	sl.head = sl.createNode(nil, nil, maxLevel)
@@ -54,13 +54,12 @@ func New() *List {
 	return sl
 }
 
-// Len return number of elements.
+// Len returns the number of elements.
 func (sl *List) Len() int {
 	return sl.lens[0]
 }
 
-// Insert inserts the key with value in the container.
-// k and v must not be nil, otherwise it will crash.
+// Insert inserts the giving key and value.
 // Returns false if key already exists.
 func (sl *List) Insert(k Key, v Value) bool {
 	var updates [maxLevel + 1]*listNode
@@ -92,7 +91,7 @@ func (sl *List) Insert(k Key, v Value) bool {
 	return true
 }
 
-// Delete remove and returns the value of the specified key.
+// Delete removes and returns the value of a given key.
 // Returns nil if not found.
 func (sl *List) Delete(k Key) Value {
 	var d *listNode
@@ -117,7 +116,7 @@ func (sl *List) Delete(k Key) Value {
 	return d.value
 }
 
-// Search get the value of specified key.
+// Search get the value of a given key.
 // Returns nil if not found.
 func (sl *List) Search(k Key) Value {
 	p := sl.head
@@ -132,7 +131,7 @@ func (sl *List) Search(k Key) Value {
 	return nil
 }
 
-// Iter return a Iterator, it's a wraps for skip.Iterator
+// Iter return aN Iterator, it's a wrap for skip.Iterator
 func (sl *List) Iter(start Key, boundary Key) container.Iterator {
 	iter := newIterator(sl, start, boundary)
 	return iter
@@ -154,7 +153,7 @@ func (sl *List) chooseLevel() int {
 	return level
 }
 
-// Search the last node that less than the 'key'.
+// Search the last node that less than the key.
 func (sl *List) searchLastLT(k Key) *listNode {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
@@ -169,7 +168,7 @@ func (sl *List) searchLastLT(k Key) *listNode {
 	return nil
 }
 
-// Search the last node that less than or equal to the 'key'.
+// Search the last node that less than or equal to the key.
 func (sl *List) searchLastLE(k Key) *listNode {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
@@ -187,7 +186,7 @@ func (sl *List) searchLastLE(k Key) *listNode {
 	return nil
 }
 
-// Search the first node that greater than to the 'key'.
+// Search the first node that greater than to the key.
 func (sl *List) searchFirstGT(k Key) *listNode {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
@@ -208,7 +207,7 @@ func (sl *List) searchFirstGT(k Key) *listNode {
 	return nil
 }
 
-// Search the first node that greater than or equal to the 'key'.
+// Search the first node that greater than or equal to the key.
 func (sl *List) searchFirstGE(k Key) *listNode {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {

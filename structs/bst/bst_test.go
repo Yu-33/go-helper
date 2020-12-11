@@ -25,6 +25,43 @@ func checkCorrect(t *testing.T, n *treeNode) {
 	}
 }
 
+func buildBSTree() (tr *Tree) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	length := 25
+	maxKey := length * 10
+
+	tr = New()
+
+	for i := 0; i < length; i++ {
+		for {
+			k := container.Int64(r.Intn(maxKey) + 1)
+			if ok := tr.Insert(k, k*2+1); ok {
+				break
+			}
+		}
+	}
+
+	return
+}
+
+func Test_Interface(t *testing.T) {
+	// Ensure the interface is implemented.
+	var node Node
+	var kv container.KV
+	var ct container.Container
+	var it container.Iterator
+
+	node = &treeNode{}
+	_ = node
+	kv = &treeNode{}
+	_ = kv
+	ct = New()
+	_ = ct
+	it = NewIterator(node, nil, nil)
+	_ = it
+}
+
 func TestNew(t *testing.T) {
 	tr := New()
 	require.NotNil(t, tr)
@@ -107,24 +144,4 @@ func TestAVLTree_createNode(t *testing.T) {
 	require.Equal(t, n1.key.Compare(el1), 0)
 	require.Nil(t, n1.left)
 	require.Nil(t, n1.right)
-}
-
-func buildBSTree() (tr *Tree) {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	length := 25
-	maxKey := length * 10
-
-	tr = New()
-
-	for i := 0; i < length; i++ {
-		for {
-			k := container.Int64(r.Intn(maxKey) + 1)
-			if ok := tr.Insert(k, k*2+1); ok {
-				break
-			}
-		}
-	}
-
-	return
 }

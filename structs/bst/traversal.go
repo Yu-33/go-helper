@@ -6,28 +6,26 @@ import (
 	"github.com/Yu-33/gohelper/structs/stack"
 )
 
-func InOrder(node Node) []KV {
-	if node == nil {
-		return nil
+// LDR return node by in-order traversal.
+// The order: Left -> Mid -> Right.
+func LDR(root Node, f func(node Node)) {
+	if root == nil {
+		return
 	}
 
-	var result []KV
 	s := stack.Default()
-	p := node
-
-	var i int
+	p := root
 
 	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
 		if !reflect.ValueOf(p).IsNil() {
 			s.Push(p)
 			p = p.Left()
 		} else {
-			p = s.Pop().(Node)
-			result = append(result, p)
-			p = p.Right()
-		}
+			n := s.Pop().(Node)
+			p = n.Right()
 
-		i++
+			f(n)
+		}
 	}
 
 	//for !s.Empty() || !reflect.ValueOf(p).IsNil() {
@@ -37,27 +35,27 @@ func InOrder(node Node) []KV {
 	//	}
 	//
 	//	if !s.Empty() {
-	//		p = s.Pop().(Node)
-	//		result = append(result, p)
-	//		p = p.Right()
+	//		n := s.Pop().(Node)
+	//		f(n)
+	//		p = n.Right()
 	//	}
 	//}
-
-	return result
 }
 
-func PreOrder(node Node) []KV {
-	if node == nil {
-		return nil
+// DLR return node by pre-order traversal.
+// The order: Mid -> Left -> Right.
+func DLR(root Node, f func(node Node)) {
+	if root == nil {
+		return
 	}
 
-	var result []KV
 	s := stack.Default()
-	p := node
+	p := root
 
 	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
 		if !reflect.ValueOf(p).IsNil() {
-			result = append(result, p)
+			f(p)
+
 			s.Push(p)
 			p = p.Left()
 		} else {
@@ -65,21 +63,19 @@ func PreOrder(node Node) []KV {
 			p = p.Right()
 		}
 	}
-
-	return result
 }
 
-func PostOrder(node Node) []KV {
-	if node == nil {
-		return nil
+// LRD return node by post-order traversal.
+// The order: Left -> Right -> Mid.
+func LRD(root Node, f func(node Node)) {
+	if root == nil {
+		return
 	}
-
-	var result []KV
 
 	var lastVisit Node
 
 	s := stack.Default()
-	p := node
+	p := root
 
 	for !reflect.ValueOf(p).IsNil() {
 		s.Push(p)
@@ -89,7 +85,8 @@ func PostOrder(node Node) []KV {
 	for !s.Empty() {
 		p = s.Pop().(Node)
 		if reflect.ValueOf(p.Right()).IsNil() || p.Right() == lastVisit {
-			result = append(result, p)
+			f(p)
+
 			lastVisit = p
 		} else {
 			s.Push(p)
@@ -100,6 +97,4 @@ func PostOrder(node Node) []KV {
 			}
 		}
 	}
-
-	return result
 }

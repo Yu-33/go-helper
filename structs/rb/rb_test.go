@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/Yu-33/gohelper/structs/bst"
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
@@ -59,6 +60,23 @@ func checkBalance(t *testing.T, n *treeNode) {
 	} else {
 		require.LessOrEqual(t, rh-lh, rh)
 	}
+}
+
+func Test_Interface(t *testing.T) {
+	// Ensure the interface is implemented.
+	var node bst.Node
+	var kv container.KV
+	var ct container.Container
+	var it container.Iterator
+
+	node = &treeNode{}
+	_ = node
+	kv = &treeNode{}
+	_ = kv
+	ct = New()
+	_ = ct
+	it = ct.Iter(nil, nil)
+	_ = it
 }
 
 func TestNew(t *testing.T) {

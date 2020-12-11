@@ -9,9 +9,11 @@ import (
 
 type Key = container.Key
 type Value = container.Value
+type KV = container.KV
 
-// treeNode used in avl tree.
-// And also implements interface bst.Node and container.KV.
+// treeNode is used for avl tree.
+//
+// And it is also the implementation of interface container.KV and bst.Node
 type treeNode struct {
 	key    Key
 	value  Value
@@ -20,37 +22,35 @@ type treeNode struct {
 	height int
 }
 
-// Implements interface container.KV.
-// Implements interface bst.Node.
+// Key returns the key.
 func (n *treeNode) Key() Key {
 	return n.key
 }
 
-// Implements interface container.KV.
-// Implements interface bst.Node.
+// Value returns the value.
 func (n *treeNode) Value() Value {
 	return n.value
 }
 
-// Implements interface bst.Node.
+// Left returns the left child of the Node.
 func (n *treeNode) Left() bst.Node {
 	return n.left
 }
 
-// Implements interface bst.Node.
+// Right returns the right child of the Node.
 func (n *treeNode) Right() bst.Node {
 	return n.right
 }
 
-// Tree implements the data struct of AVL tree.
+// Tree implements the AVL Tree.
 //
-// And also implements interface container.Container
+// And it is also the implementation of interface container.Container
 type Tree struct {
 	root *treeNode
 	len  int
 }
 
-// New creates an AVL Tree.
+// New creates an Tree.
 func New() *Tree {
 	tr := &Tree{
 		root: nil,
@@ -64,8 +64,7 @@ func (tr *Tree) Len() int {
 	return tr.len
 }
 
-// Insert inserts the key with value in the container.
-// k and v must not be nil, otherwise it will crash.
+// Insert inserts the giving key and value.
 // Returns false if key already exists.
 func (tr *Tree) Insert(k Key, v Value) bool {
 	var n *treeNode
@@ -77,7 +76,7 @@ func (tr *Tree) Insert(k Key, v Value) bool {
 	return true
 }
 
-// Delete remove and returns the value of the specified key.
+// Delete removes and returns the value of a given key.
 // Returns nil if not found.
 func (tr *Tree) Delete(k Key) Value {
 	var d *treeNode
@@ -90,7 +89,7 @@ func (tr *Tree) Delete(k Key) Value {
 	return d.value
 }
 
-// Search get the value of specified key.
+// Search get the value of a given key.
 // Returns nil if not found.
 func (tr *Tree) Search(k Key) Value {
 	p := tr.root
@@ -107,7 +106,7 @@ func (tr *Tree) Search(k Key) Value {
 	return nil
 }
 
-// Iter return a Iterator, it's a wraps for bst.Iterator.
+// Iter return an Iterator, it's a wrap for bst.Iterator.
 func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
 	it := bst.NewIterator(tr.root, start, boundary)
 	return it
@@ -118,7 +117,7 @@ func (tr *Tree) swap(n1, n2 *treeNode) {
 	n1.value, n2.value = n2.value, n1.value
 }
 
-// return (new root, new node)
+// return (root root, new node)
 func (tr *Tree) insert(root *treeNode, k Key, v Value) (*treeNode, *treeNode) {
 	var n *treeNode
 
@@ -145,7 +144,7 @@ func (tr *Tree) insert(root *treeNode, k Key, v Value) (*treeNode, *treeNode) {
 	return root, n
 }
 
-// return (new root, delete node).
+// return (root root, delete node).
 func (tr *Tree) delete(root *treeNode, k Key) (*treeNode, *treeNode) {
 	var d *treeNode
 	if root == nil {
@@ -154,10 +153,10 @@ func (tr *Tree) delete(root *treeNode, k Key) (*treeNode, *treeNode) {
 	} else {
 		flag := k.Compare(root.key)
 		if flag == -1 {
-			// delete from the left subtree
+			// delete from the left subtree.
 			root.left, d = tr.delete(root.left, k)
 		} else if flag == 1 {
-			// delete from the right subtree
+			// delete from the right subtree.
 			root.right, d = tr.delete(root.right, k)
 		} else {
 			if root.left != nil && root.right != nil {
@@ -204,13 +203,13 @@ func (tr *Tree) reBalance(n *treeNode) *treeNode {
 	case -1, 0, 1:
 		n.height = tr.calculateHeight(n)
 	case 2:
-		// Left subtree higher than right subtree
+		// Left subtree higher than right subtree.
 		if tr.nodeHeight(n.left.right) > tr.nodeHeight(n.left.left) {
 			n.left = tr.leftRotate(n.left)
 		}
 		n = tr.rightRotate(n)
 	case -2:
-		// Left subtree lower than right subtree
+		// Left subtree lower than right subtree.
 		if tr.nodeHeight(n.right.left) > tr.nodeHeight(n.right.right) {
 			n.right = tr.rightRotate(n.right)
 		}

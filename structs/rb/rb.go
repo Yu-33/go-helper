@@ -13,8 +13,9 @@ const (
 type Key = container.Key
 type Value = container.Value
 
-// treeNode used in rb tree.
-// And also implements interface bst.Node and container.KV.
+// treeNode is used for Red-Black Tree.
+//
+// And it is also the implementation of interface container.KV and bst.Node
 type treeNode struct {
 	key    Key
 	value  Value
@@ -24,37 +25,35 @@ type treeNode struct {
 	color  int8
 }
 
-// Implements interface container.KV.
-// Implements interface bst.Node.
+// Key returns the key.
 func (n *treeNode) Key() Key {
 	return n.key
 }
 
-// Implements interface container.KV.
-// Implements interface bst.Node.
+// Value returns the value.
 func (n *treeNode) Value() Value {
 	return n.value
 }
 
-// Implements interface bst.Node.
+// Left returns the left child of the Node.
 func (n *treeNode) Left() bst.Node {
 	return n.left
 }
 
-// Implements interface bst.Node.
+// Right returns the right child of the Node.
 func (n *treeNode) Right() bst.Node {
 	return n.right
 }
 
-// Tree implements the data struct of red-black tree.
+// Tree implements the Red-Black Tree.
 //
-// And also implements interface container.Container
+// And it is also the implementation of interface container.Container
 type Tree struct {
 	root *treeNode
 	len  int
 }
 
-// New creates an red-black Tree.
+// New creates an Red-Black Tree.
 func New() *Tree {
 	tr := &Tree{
 		root: nil,
@@ -68,8 +67,7 @@ func (tr *Tree) Len() int {
 	return tr.len
 }
 
-// Insert inserts the key with value in the container.
-// k and v must not be nil, otherwise it will crash.
+// Insert inserts the giving key and value.
 // Returns false if key already exists.
 func (tr *Tree) Insert(k Key, v Value) bool {
 	var n *treeNode
@@ -105,7 +103,7 @@ func (tr *Tree) Insert(k Key, v Value) bool {
 	return true
 }
 
-// Delete remove and returns the value of the specified key.
+// Delete removes and returns the value of a given key.
 // Returns nil if not found.
 func (tr *Tree) Delete(k Key) Value {
 	d := tr.root
@@ -160,7 +158,7 @@ func (tr *Tree) Delete(k Key) Value {
 	return d.value
 }
 
-// Search get the value of specified key.
+// Search get the value of a given key.
 // Returns nil if not found.
 func (tr *Tree) Search(k Key) Value {
 	p := tr.root
@@ -177,7 +175,7 @@ func (tr *Tree) Search(k Key) Value {
 	return nil
 }
 
-// Iter return a Iterator, it's a wraps for bst.Iterator.
+// Iter return an Iterator, it's a wrap for bst.Iterator.
 func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
 	it := bst.NewIterator(tr.root, start, boundary)
 	return it

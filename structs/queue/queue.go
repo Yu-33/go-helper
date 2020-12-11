@@ -4,7 +4,7 @@ const (
 	defaultCapacity = 64
 )
 
-// Queue type implements a queue by dynamic array.
+// Queue implements a queue by dynamic array.
 // Is not thread safe.
 type Queue struct {
 	items  []interface{}

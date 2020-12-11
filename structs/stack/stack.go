@@ -4,7 +4,7 @@ const (
 	defaultCapacity = 64
 )
 
-// Stack implements a stack THAT LIFO.
+// Stack implements a stack (LIFO).
 type Stack struct {
 	items []interface{}
 	cap   int

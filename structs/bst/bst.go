@@ -4,8 +4,9 @@ import (
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
-// treeNode used in binary search tree.
-// And also implements interface bst.Node and container.KV.
+// treeNode is used for Binary Search Tree.
+//
+// And it is also the implementation of interface container.KV and bst.Node
 type treeNode struct {
 	key   Key
 	value Value
@@ -13,37 +14,35 @@ type treeNode struct {
 	right *treeNode
 }
 
-// Implements interface container.KV.
-// Implements interface bst.Node.
+// Key returns the key.
 func (n *treeNode) Key() Key {
 	return n.key
 }
 
-// Implements interface container.KV.
-// Implements interface bst.Node.
+// Value returns the value.
 func (n *treeNode) Value() Value {
 	return n.value
 }
 
-// Implements interface bst.Node.
+// Left returns the left child of the Node.
 func (n *treeNode) Left() Node {
 	return n.left
 }
 
-// Implements interface bst.Node.
+// Right returns the right child of the Node.
 func (n *treeNode) Right() Node {
 	return n.right
 }
 
-// Tree implements the data struct binary search Tree.
+// Tree implements the Binary Search Tree.
 //
-// And also implements interface container.Container
+// And it is also the implementation of interface container.Container
 type Tree struct {
 	root *treeNode
 	len  int
 }
 
-// New creates binary search Tree.
+// New creates an Tree.
 func New() *Tree {
 	tr := &Tree{
 		root: nil,
@@ -52,13 +51,12 @@ func New() *Tree {
 	return tr
 }
 
-// Len return number of elements.
+// Len returns the number of elements.
 func (tr *Tree) Len() int {
 	return tr.len
 }
 
-// Insert inserts the key with value in the container.
-// k and v must not be nil, otherwise it will crash.
+// Insert inserts the giving key and value.
 // Returns false if key already exists.
 func (tr *Tree) Insert(k Key, v Value) bool {
 	p := tr.root
@@ -90,7 +88,7 @@ func (tr *Tree) Insert(k Key, v Value) bool {
 	return true
 }
 
-// Delete remove and returns the value of the specified key.
+// Delete removes and returns the value of a given key.
 // Returns nil if not found.
 func (tr *Tree) Delete(k Key) Value {
 	var dd *treeNode
@@ -148,7 +146,7 @@ func (tr *Tree) Delete(k Key) Value {
 	return d.value
 }
 
-// Search get the value of specified key.
+// Search get the value of a given key.
 // Returns nil if not found.
 func (tr *Tree) Search(k Key) Value {
 	p := tr.root
@@ -165,7 +163,7 @@ func (tr *Tree) Search(k Key) Value {
 	return nil
 }
 
-// Iter return a Iterator, it's a wraps for bst.Iterator.
+// Iter return an Iterator, it's a wrap for bst.Iterator.
 func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
 	it := NewIterator(tr.root, start, boundary)
 	return it

@@ -1,43 +1,47 @@
 package container
 
 // Key represents high-level Key type.
-type Key Comparator
+type Key = Comparator
 
 // Value represents high-level Value type.
 type Value interface{}
 
 // KV defines an interface to describe k/v pair.
 type KV interface {
+	// Key returns the key.
 	Key() Key
+	// Value returns the value.
 	Value() Value
 }
 
 // Container defines an data container interface.
 type Container interface {
-	// Len returns the number of elements in the container.
+	// Len returns the number of elements.
 	Len() int
 
-	// Insert inserts the key with value in the container.
-	// k and v must not be nil, otherwise it will crash.
+	// Insert inserts the giving key and value.
 	// Returns false if key already exists.
 	Insert(k Key, v Value) bool
 
-	// Delete remove and returns the value of the specified key.
+	// Delete removes and returns the value of a given key.
 	// Returns nil if not found.
 	Delete(k Key) (v Value)
 
-	// Search get the value of specified key.
+	// Search get the value of a given key.
 	// Returns nil if not found.
 	Search(k Key) (v Value)
 
-	// Iter returns an iterator to get the specified range of data.
-	// Range: start <= x < boundary, and you should allowed the start or boundary is nil.
+	// Iter creates an iterator to get the data for the specified range.
+	//
+	// Range interval: ( start <= x < boundary ).
+	// We will return data from the beginning if start is nil,
+	// And return data util the end if boundary is nil.
 	Iter(start Key, boundary Key) Iterator
 }
 
-// Iterator defines an iterator interface to returns ranges data.
+// Iterator defines an iterator interface to returns multiple data.
 type Iterator interface {
-	// Valid represents whether have more elements.
+	// Valid represents whether to have more elements in the Iterator.
 	Valid() bool
 
 	// Next returns a k/v pair and moved the iterator to the next pair.

@@ -6,10 +6,34 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func inOrder(root Node) []KV {
+	var result []KV
+	LDR(root, func(node Node) {
+		result = append(result, node)
+	})
+	return result
+}
+
+func preOrder(root Node) []KV {
+	var result []KV
+	DLR(root, func(node Node) {
+		result = append(result, node)
+	})
+	return result
+}
+
+func postOrder(root Node) []KV {
+	var result []KV
+	LRD(root, func(node Node) {
+		result = append(result, node)
+	})
+	return result
+}
+
 func TestInOrder(t *testing.T) {
 	tr := buildBSTree()
 
-	r1 := InOrder(tr.root)
+	r1 := inOrder(tr.root)
 
 	var f func(node *treeNode)
 
@@ -30,7 +54,7 @@ func TestInOrder(t *testing.T) {
 
 func TestPreOrder(t *testing.T) {
 	tr := buildBSTree()
-	r1 := PreOrder(tr.root)
+	r1 := preOrder(tr.root)
 
 	var f func(node *treeNode)
 
@@ -52,7 +76,7 @@ func TestPreOrder(t *testing.T) {
 func TestPostOrder(t *testing.T) {
 	tr := buildBSTree()
 
-	r1 := PostOrder(tr.root)
+	r1 := postOrder(tr.root)
 
 	var f func(node *treeNode)
 

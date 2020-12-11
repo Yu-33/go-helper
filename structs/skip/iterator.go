@@ -1,9 +1,12 @@
 package skip
 
-// Iterator used to get the specified range of data.
-// The range is start <= x < boundary, and we allowed the start or boundary is nil.
+// Iterator to get the data for the specified range.
 //
-// And also implements interface container.Iterator.
+// Range interval: ( start <= x < boundary ).
+// We will return data from the beginning if start is nil,
+// And return data util the end if boundary is nil.
+//
+// And it is also the implementation of interface container.Iterator
 type Iterator struct {
 	node *listNode
 	end  *listNode
@@ -33,21 +36,16 @@ func newIterator(sl *List, start Key, boundary Key) *Iterator {
 	return iter
 }
 
-// Valid represents whether have more elements.
-//
-// And also implements interface container.Iterator.
+// Valid represents whether to have more elements in the Iterator.
 func (iter *Iterator) Valid() bool {
 	if iter.node == nil || iter.node == iter.end {
 		return false
 	}
-
 	return true
 }
 
 // Next returns a k/v pair and moved the iterator to the next pair.
 // Returns nil if no more elements.
-//
-// And also implements interface container.Iterator.
 func (iter *Iterator) Next() KV {
 	if !iter.Valid() {
 		return nil

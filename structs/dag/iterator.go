@@ -4,27 +4,30 @@ import (
 	"github.com/Yu-33/gohelper/structs/queue"
 )
 
-// IterTopo implements Iterator by Topology algo.
+// IterTopo implements an iterator by Topological Sorting(Kahn Algorithm).
+//
 type IterTopo struct {
 	q         *queue.Queue
-	inDegrees map[Vertex]int
+	inDegrees map[*Vertex]int
 }
 
+// newIterTopo is an interval func helper creates an IterTopo.
 func newIterTopo(g *DAG) *IterTopo {
 	q := queue.Default()
+	inDegrees := make(map[*Vertex]int, q.Len())
 
-	inDegrees := make(map[Vertex]int)
-
+	// Init the iterator.
 	vexIt := g.vertexes.Iter(nil, nil)
 	for vexIt.Valid() {
 		kv := vexIt.Next()
-		degree := kv.Value().(*Node).in.Len()
+		vex := kv.Value().(*Vertex)
 
-		inDegrees[kv.Key()] = degree
-
-		// Add the vertex with zero degree into the queue.
+		degree := vex.in.Len()
 		if degree == 0 {
-			q.Push(kv)
+			// Add the vertex that zero in-degree to queue.
+			q.Push(vex)
+		} else {
+			inDegrees[vex] = degree
 		}
 	}
 
@@ -35,32 +38,55 @@ func newIterTopo(g *DAG) *IterTopo {
 	return it
 }
 
+// Valid represents whether has more vertex in iterator.
 func (it *IterTopo) Valid() bool {
 	return !it.q.Empty()
 }
 
-// FIXME:
-func (it *IterTopo) Next() []KV {
+// Next returns a vertex that in-degree is zero.
+// Returns nil if no more.
+func (it *IterTopo) Next() *Vertex {
 	if !it.Valid() {
 		return nil
 	}
-	vertexes := make([]KV, 0, it.q.Len())
+
+	vex := it.q.Pop().(*Vertex)
+	it.fillQueue(vex)
+
+	return vex
+}
+
+// Batch returns all vertexes that in-degree is zero at once.
+// Returns nil if no more.
+func (it *IterTopo) Batch() []*Vertex {
+	if !it.Valid() {
+		return nil
+	}
+
+	vexes := make([]*Vertex, 0, it.q.Len())
 
 	for !it.q.Empty() {
-		kv := it.q.Pop().(KV)
-		vertexes = append(vertexes, kv)
+		vex := it.q.Pop().(*Vertex)
+		vexes = append(vexes, vex)
 	}
 
-	for i := range vertexes {
-		itOut := vertexes[i].Value().(*Node).out.Iter(nil, nil)
-		for itOut.Valid() {
-			kv := itOut.Next()
-			it.inDegrees[kv.Key()]--
-			if it.inDegrees[kv.Key()] == 0 {
-				it.q.Push(kv)
-			}
+	for i := range vexes {
+		it.fillQueue(vexes[i])
+	}
+
+	return vexes
+}
+
+func (it *IterTopo) fillQueue(vex *Vertex) {
+	itOut := vex.out.Iter(nil, nil)
+	for itOut.Valid() {
+		kv := itOut.Next()
+		vex := kv.Value().(*Vertex)
+
+		it.inDegrees[vex]--
+		if it.inDegrees[vex] == 0 {
+			delete(it.inDegrees, vex)
+			it.q.Push(vex)
 		}
 	}
-
-	return vertexes
 }
