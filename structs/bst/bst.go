@@ -88,9 +88,9 @@ func (tr *Tree) Insert(k Key, v Value) bool {
 	return true
 }
 
-// Delete removes and returns the value of a given key.
+// Delete removes and returns the KV structure corresponding to the given key.
 // Returns nil if not found.
-func (tr *Tree) Delete(k Key) Value {
+func (tr *Tree) Delete(k Key) KV {
 	var dd *treeNode
 	d := tr.root
 
@@ -142,13 +142,16 @@ func (tr *Tree) Delete(k Key) Value {
 		dd.right = c
 	}
 
+	d.left = nil
+	d.right = nil
+
 	tr.len--
-	return d.value
+	return d
 }
 
-// Search get the value of a given key.
+// Search returns the KV structure corresponding to the given key.
 // Returns nil if not found.
-func (tr *Tree) Search(k Key) Value {
+func (tr *Tree) Search(k Key) KV {
 	p := tr.root
 	for p != nil {
 		flag := k.Compare(p.key)
@@ -157,7 +160,7 @@ func (tr *Tree) Search(k Key) Value {
 		} else if flag == 1 {
 			p = p.right
 		} else {
-			return p.value
+			return p
 		}
 	}
 	return nil
@@ -165,8 +168,7 @@ func (tr *Tree) Search(k Key) Value {
 
 // Iter return an Iterator, it's a wrap for bst.Iterator.
 func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
-	it := NewIterator(tr.root, start, boundary)
-	return it
+	return NewIterator(tr.root, start, boundary)
 }
 
 func (tr *Tree) createNode(k Key, v Value) *treeNode {

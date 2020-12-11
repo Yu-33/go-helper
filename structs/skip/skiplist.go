@@ -91,9 +91,9 @@ func (sl *List) Insert(k Key, v Value) bool {
 	return true
 }
 
-// Delete removes and returns the value of a given key.
+// Delete removes and returns the KV structure corresponding to the given key.
 // Returns nil if not found.
-func (sl *List) Delete(k Key) Value {
+func (sl *List) Delete(k Key) KV {
 	var d *listNode
 	p := sl.head
 
@@ -108,33 +108,39 @@ func (sl *List) Delete(k Key) Value {
 			p.next[i] = p.next[i].next[i]
 			sl.lens[i]--
 		}
+
+		if sl.head.next[i] == nil && i != 0 {
+			sl.level--
+		}
 	}
+
 	if d == nil {
 		return nil
 	}
 
-	return d.value
+	d.next = nil
+
+	return d
 }
 
-// Search get the value of a given key.
+// Search returns the KV structure corresponding to the given key.
 // Returns nil if not found.
-func (sl *List) Search(k Key) Value {
+func (sl *List) Search(k Key) KV {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
 			p = p.next[i]
 		}
 		if p.next[i] != nil && p.next[i].key.Compare(k) == 0 {
-			return p.next[i].value
+			return p.next[i]
 		}
 	}
 	return nil
 }
 
-// Iter return aN Iterator, it's a wrap for skip.Iterator
+// Iter return an Iterator, it's a wrap for skip.Iterator
 func (sl *List) Iter(start Key, boundary Key) container.Iterator {
-	iter := newIterator(sl, start, boundary)
-	return iter
+	return newIterator(sl, start, boundary)
 }
 
 func (sl *List) createNode(k Key, v Value, level int) *listNode {

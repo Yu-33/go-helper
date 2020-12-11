@@ -8,6 +8,16 @@ import (
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
+func searchRange(root Node, start Key, boundary Key) []KV {
+	var result []KV
+
+	SearchRange(root, start, boundary, func(n Node) {
+		result = append(result, n)
+	})
+
+	return result
+}
+
 func searchRangeByRecursion(root *treeNode, start Key, boundary Key) []KV {
 	if root == nil {
 		return nil
@@ -15,21 +25,21 @@ func searchRangeByRecursion(root *treeNode, start Key, boundary Key) []KV {
 
 	var result []KV
 
-	var recursion func(node *treeNode, start Key, boundary Key)
+	var recursion func(n *treeNode, start Key, boundary Key)
 
-	recursion = func(node *treeNode, start Key, boundary Key) {
-		if node == nil {
+	recursion = func(n *treeNode, start Key, boundary Key) {
+		if n == nil {
 			return
 		}
-		if start != nil && node.key.Compare(start) == -1 {
-			recursion(node.right, start, boundary)
-		} else if boundary != nil && node.key.Compare(boundary) != -1 {
-			recursion(node.left, start, boundary)
+		if start != nil && n.key.Compare(start) == -1 {
+			recursion(n.right, start, boundary)
+		} else if boundary != nil && n.key.Compare(boundary) != -1 {
+			recursion(n.left, start, boundary)
 		} else {
 			// start <= node <= boundary
-			recursion(node.left, start, boundary)
-			result = append(result, node)
-			recursion(node.right, start, boundary)
+			recursion(n.left, start, boundary)
+			result = append(result, n)
+			recursion(n.right, start, boundary)
 		}
 	}
 
@@ -46,12 +56,10 @@ func searchRangeByIter(root *treeNode, start Key, boundary Key) []KV {
 	var result []KV
 
 	it := NewIterator(root, start, boundary)
-
 	for it.Valid() {
 		n := it.Next()
 		result = append(result, n)
 	}
-
 	return result
 }
 
@@ -70,13 +78,13 @@ func TestSearchRange(t *testing.T) {
 
 	/* ------ test start == nil && boundary == nil */
 
-	r1 = SearchRange(nil, nil, nil)
+	r1 = searchRange(nil, nil, nil)
 	r2 = searchRangeByRecursion(nil, nil, nil)
 	r3 = searchRangeByIter(nil, nil, nil)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, nil, nil)
+	r1 = searchRange(tr.root, nil, nil)
 	r2 = searchRangeByRecursion(tr.root, nil, nil)
 	r3 = searchRangeByIter(tr.root, nil, nil)
 	require.Equal(t, r1, r2)
@@ -84,49 +92,49 @@ func TestSearchRange(t *testing.T) {
 
 	/* ---  test start != nil && boundary == nil --- */
 
-	r1 = SearchRange(tr.root, container.Int64(21), nil)
+	r1 = searchRange(tr.root, container.Int64(21), nil)
 	r2 = searchRangeByRecursion(tr.root, container.Int64(21), nil)
 	r3 = searchRangeByIter(tr.root, container.Int64(21), nil)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, container.Int64(22), nil)
+	r1 = searchRange(tr.root, container.Int64(22), nil)
 	r2 = searchRangeByRecursion(tr.root, container.Int64(22), nil)
 	r3 = searchRangeByIter(tr.root, container.Int64(22), nil)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, container.Int64(27), nil)
+	r1 = searchRange(tr.root, container.Int64(27), nil)
 	r2 = searchRangeByRecursion(tr.root, container.Int64(27), nil)
 	r3 = searchRangeByIter(tr.root, container.Int64(27), nil)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, container.Int64(62), nil)
+	r1 = searchRange(tr.root, container.Int64(62), nil)
 	r2 = searchRangeByRecursion(tr.root, container.Int64(62), nil)
 	r3 = searchRangeByIter(tr.root, container.Int64(62), nil)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, container.Int64(132), nil)
+	r1 = searchRange(tr.root, container.Int64(132), nil)
 	r2 = searchRangeByRecursion(tr.root, container.Int64(132), nil)
 	r3 = searchRangeByIter(tr.root, container.Int64(132), nil)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, container.Int64(144), nil)
+	r1 = searchRange(tr.root, container.Int64(144), nil)
 	r2 = searchRangeByRecursion(tr.root, container.Int64(144), nil)
 	r3 = searchRangeByIter(tr.root, container.Int64(144), nil)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, container.Int64(150), nil)
+	r1 = searchRange(tr.root, container.Int64(150), nil)
 	r2 = searchRangeByRecursion(tr.root, container.Int64(150), nil)
 	r3 = searchRangeByIter(tr.root, container.Int64(150), nil)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, container.Int64(156), nil)
+	r1 = searchRange(tr.root, container.Int64(156), nil)
 	r2 = searchRangeByRecursion(tr.root, container.Int64(156), nil)
 	r3 = searchRangeByIter(tr.root, container.Int64(156), nil)
 	require.Equal(t, r1, r2)
@@ -134,35 +142,35 @@ func TestSearchRange(t *testing.T) {
 
 	/* ---  test start == nil && boundary != nil --- */
 
-	r1 = SearchRange(tr.root, nil, container.Int64(21))
+	r1 = searchRange(tr.root, nil, container.Int64(21))
 	r2 = searchRangeByRecursion(tr.root, nil, container.Int64(21))
 	r3 = searchRangeByIter(tr.root, nil, container.Int64(21))
 	require.Equal(t, len(r1), 0)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, nil, container.Int64(22))
+	r1 = searchRange(tr.root, nil, container.Int64(22))
 	r2 = searchRangeByRecursion(tr.root, nil, container.Int64(22))
 	r3 = searchRangeByIter(tr.root, nil, container.Int64(22))
 	require.Equal(t, len(r1), 0)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, nil, container.Int64(77))
+	r1 = searchRange(tr.root, nil, container.Int64(77))
 	r2 = searchRangeByRecursion(tr.root, nil, container.Int64(77))
 	r3 = searchRangeByIter(tr.root, nil, container.Int64(77))
 	require.Equal(t, len(r1), 7)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, nil, container.Int64(147))
+	r1 = searchRange(tr.root, nil, container.Int64(147))
 	r2 = searchRangeByRecursion(tr.root, nil, container.Int64(147))
 	r3 = searchRangeByIter(tr.root, nil, container.Int64(147))
 	require.Equal(t, len(r1), 14)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, nil, container.Int64(150))
+	r1 = searchRange(tr.root, nil, container.Int64(150))
 	r2 = searchRangeByRecursion(tr.root, nil, container.Int64(150))
 	r3 = searchRangeByIter(tr.root, nil, container.Int64(150))
 	require.Equal(t, len(r1), 14)
@@ -171,7 +179,7 @@ func TestSearchRange(t *testing.T) {
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, nil, container.Int64(156))
+	r1 = searchRange(tr.root, nil, container.Int64(156))
 	r2 = searchRangeByRecursion(tr.root, nil, container.Int64(156))
 	r3 = searchRangeByIter(tr.root, nil, container.Int64(156))
 	require.Equal(t, len(r1), 15)
@@ -182,28 +190,28 @@ func TestSearchRange(t *testing.T) {
 
 	/* ---  test start != nil && boundary == nil --- */
 
-	r1 = SearchRange(tr.root, container.Int64(21), container.Int64(13))
+	r1 = searchRange(tr.root, container.Int64(21), container.Int64(13))
 	r2 = searchRangeByRecursion(tr.root, container.Int64(21), container.Int64(13))
 	r3 = searchRangeByIter(tr.root, container.Int64(21), container.Int64(13))
 	require.Equal(t, len(r1), 0)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, container.Int64(65), container.Int64(27))
+	r1 = searchRange(tr.root, container.Int64(65), container.Int64(27))
 	r2 = searchRangeByRecursion(tr.root, container.Int64(65), container.Int64(27))
 	r3 = searchRangeByIter(tr.root, container.Int64(65), container.Int64(27))
 	require.Equal(t, len(r1), 0)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, container.Int64(68), container.Int64(132))
+	r1 = searchRange(tr.root, container.Int64(68), container.Int64(132))
 	r2 = searchRangeByRecursion(tr.root, container.Int64(68), container.Int64(132))
 	r3 = searchRangeByIter(tr.root, container.Int64(68), container.Int64(132))
 	require.Equal(t, len(r1), 6)
 	require.Equal(t, r1, r2)
 	require.Equal(t, r2, r3)
 
-	r1 = SearchRange(tr.root, container.Int64(21), container.Int64(156))
+	r1 = searchRange(tr.root, container.Int64(21), container.Int64(156))
 	r2 = searchRangeByRecursion(tr.root, container.Int64(21), container.Int64(156))
 	r3 = searchRangeByIter(tr.root, container.Int64(21), container.Int64(156))
 	require.Equal(t, len(r1), 15)

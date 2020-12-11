@@ -39,34 +39,34 @@ func (g *DAG) AddVertex(k Key, v Value) bool {
 // DelVertex removes the vertex by giving key and returns its value.
 // Returns nil if vertex not exists.
 func (g *DAG) DelVertex(k Key) Value {
-	v := g.vertexes.Delete(k)
-	if v == nil {
+	kv := g.vertexes.Delete(k)
+	if kv == nil {
 		return nil
 	}
 
-	n := v.(*Vertex)
-	n.in = nil
-	n.out = nil
+	vex := kv.Value().(*Vertex)
+	vex.in = nil
+	vex.out = nil
 
 	// Delete edges form other vertices that attach to this vertex.
 	it := g.vertexes.Iter(nil, nil)
 	for it.Valid() {
 		kv := it.Next()
-		n1 := kv.Value().(*Vertex)
-		_ = n1.in.Delete(k)
-		_ = n1.out.Delete(k)
+		vt := kv.Value().(*Vertex)
+		_ = vt.in.Delete(k)
+		_ = vt.out.Delete(k)
 	}
 
-	return n.value
+	return vex.value
 }
 
 // GetVertex get the value of a given key.
 func (g *DAG) GetVertex(k Key) Value {
-	v := g.vertexes.Search(k)
-	if v == nil {
-		return v
+	kv := g.vertexes.Search(k)
+	if kv == nil {
+		return nil
 	}
-	return v.(*Vertex).value
+	return kv.Value().(*Vertex).value
 }
 
 // AddEdge attaches an edge from vertex to adjacency.
@@ -81,21 +81,22 @@ func (g *DAG) AddEdge(vex, adj Key) bool {
 		panic("dag:AddEdge: vertex can not equal to adjacency")
 	}
 
-	v1 := g.vertexes.Search(vex)
-	if v1 == nil {
+	kv1 := g.vertexes.Search(vex)
+	if kv1 == nil {
 		panic("dag:AddEdge: vertex not exists")
 	}
-	v2 := g.vertexes.Search(adj)
-	if v2 == nil {
+	kv2 := g.vertexes.Search(adj)
+	if kv2 == nil {
 		panic("dag:AddEdge: adjacency not exists")
 	}
 
-	n1 := v1.(*Vertex)
-	n2 := v2.(*Vertex)
+	vex1 := kv1.Value().(*Vertex)
+	vex2 := kv2.Value().(*Vertex)
 
+	// FIXME: refactor it.
 	// Check whether has ring.
 	s := stack.Default()
-	s.Push([]interface{}{adj, n2})
+	s.Push([]interface{}{adj, vex2})
 
 	for !s.Empty() {
 		x := s.Pop().([]interface{})
@@ -115,8 +116,8 @@ func (g *DAG) AddEdge(vex, adj Key) bool {
 
 	// Attach edges
 	// FIXME: We needs check edges exists first ?
-	_ = n1.out.Insert(adj, n2)
-	_ = n2.in.Insert(vex, n1)
+	_ = vex1.out.Insert(adj, vex2)
+	_ = vex2.in.Insert(vex, vex1)
 
 	return true
 }
@@ -131,19 +132,19 @@ func (g *DAG) DelEdge(vex, adj Key) bool {
 		panic("dag:DelEdge: vertex can not equal to adjacency")
 	}
 
-	v1 := g.vertexes.Search(vex)
-	if v1 == nil {
+	kv1 := g.vertexes.Search(vex)
+	if kv1 == nil {
 		panic("dag:DelEdge: vertex not exists")
 	}
-	v2 := g.vertexes.Search(adj)
-	if v2 == nil {
+	kv2 := g.vertexes.Search(adj)
+	if kv2 == nil {
 		panic("dag:DelEdge: adjacency not exists")
 	}
 
-	if v := v1.(*Vertex).out.Delete(adj); v == nil {
+	if kv := kv1.Value().(*Vertex).out.Delete(adj); kv == nil {
 		return false
 	}
-	if v := v2.(*Vertex).in.Delete(vex); v == nil {
+	if kv := kv2.Value().(*Vertex).in.Delete(vex); kv == nil {
 		return false
 	}
 

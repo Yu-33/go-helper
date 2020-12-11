@@ -12,17 +12,17 @@ import (
 )
 
 func output(sl *List) {
-	//fmt.Println("---------- output ---------")
-	//for i := 0; i <= sl.level; i++ {
-	//	fmt.Printf("Level <%d, %d> | ", i, sl.lens[i])
-	//	p := sl.head.next[i]
-	//	for p != nil {
-	//		fmt.Printf("%d -> ", p.key)
-	//		p = p.next[i]
-	//	}
-	//	fmt.Printf("\n")
-	//}
-	//fmt.Println("---------- output ---------")
+	fmt.Println("---------- output ---------")
+	for i := 0; i <= sl.level; i++ {
+		fmt.Printf("Level <%d, %d> | ", i, sl.lens[i])
+		p := sl.head.next[i]
+		for p != nil {
+			fmt.Printf("%d -> ", p.key)
+			p = p.next[i]
+		}
+		fmt.Printf("\n")
+	}
+	fmt.Println("---------- output ---------")
 }
 
 func checkCorrect(t *testing.T, sl *List) {
@@ -64,460 +64,136 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestSkipList(t *testing.T) {
+func TestList_createNode(t *testing.T) {
+	sl := New()
+
+	k := container.Int64(0xf)
+	v := 1024
+	level := 10
+
+	n := sl.createNode(k, v, level)
+	require.NotNil(t, n)
+	require.Equal(t, n.key.Compare(k), 0)
+	require.Equal(t, n.value, v)
+	require.Equal(t, len(n.next), level+1)
+
+	for i := 0; i <= level; i++ {
+		require.Nil(t, sl.head.next[i])
+		require.Equal(t, sl.lens[i], 0)
+	}
+}
+
+func TestList_Insert(t *testing.T) {
+	sl := New()
+
+	require.True(t, sl.Insert(container.Int(11), 1024))
+	require.False(t, sl.Insert(container.Int(11), 1023))
+	require.True(t, sl.Insert(container.Int(33), nil))
+	require.False(t, sl.Insert(container.Int(33), nil))
+	require.True(t, sl.Insert(container.Int(22), nil))
+	require.False(t, sl.Insert(container.Int(22), nil))
+}
+
+func TestList_Delete(t *testing.T) {
+	sl := New()
+	require.True(t, sl.Insert(container.Int(11), 1021))
+	require.True(t, sl.Insert(container.Int(22), 1022))
+	require.True(t, sl.Insert(container.Int(33), 1023))
+
+	kv := sl.Delete(container.Int(11))
+	require.NotNil(t, kv)
+	require.Equal(t, kv.Key().Compare(container.Int(11)), 0)
+	require.Equal(t, kv.Value(), 1021)
+	require.Nil(t, kv.(*listNode).next)
+	require.Nil(t, sl.Delete(container.Int(11)))
+
+	require.NotNil(t, sl.Delete(container.Int(22)))
+	require.Nil(t, sl.Delete(container.Int(22)))
+	require.NotNil(t, sl.Delete(container.Int(33)))
+	require.Nil(t, sl.Delete(container.Int(33)))
+
+	// Try to delete key not exists.
+	require.Nil(t, sl.Delete(container.Int(1024)))
+}
+
+func TestList_Search(t *testing.T) {
+	sl := New()
+	require.True(t, sl.Insert(container.Int(11), 1021))
+	require.True(t, sl.Insert(container.Int(22), 1022))
+	require.True(t, sl.Insert(container.Int(33), 1023))
+
+	require.Equal(t, sl.Search(container.Int(11)).Key().Compare(container.Int(11)), 0)
+	require.Equal(t, sl.Search(container.Int(11)).Value(), 1021)
+	require.Equal(t, sl.Search(container.Int(22)).Key().Compare(container.Int(22)), 0)
+	require.Equal(t, sl.Search(container.Int(22)).Value(), 1022)
+	require.Equal(t, sl.Search(container.Int(33)).Key().Compare(container.Int(33)), 0)
+	require.Equal(t, sl.Search(container.Int(33)).Value(), 1023)
+
+	// Try to search key not exists.
+	require.Nil(t, sl.Search(container.Int(1024)))
+}
+
+func TestList(t *testing.T) {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	sl := New()
 
-	length := 259
-	maxKey := length * 10
+	length := 257
+	maxKey := length * 100
 	keys := make([]container.Int64, length)
 
 	for x := 0; x < 2; x++ {
-		// Test insert
+		// insert
 		for i := 0; i < length; i++ {
 			for {
 				k := container.Int64(r.Intn(maxKey) + 1)
 				if ok := sl.Insert(k, int64(k*2+1)); ok {
+					require.False(t, sl.Insert(k, int64(k*2+1)))
 					keys[i] = k
 					break
 				}
 			}
+			checkCorrect(t, sl)
+			require.Equal(t, sl.Len(), i+1)
 		}
 
-		output(sl)
-
-		require.Equal(t, sl.lens[0], length)
+		require.Equal(t, sl.Len(), length)
 		require.LessOrEqual(t, sl.level, maxLevel)
-		checkCorrect(t, sl)
 
 		// boundary
 		for _, k := range []container.Int64{0, 0xfffffff} {
 			require.True(t, sl.Insert(k, k))
 			require.False(t, sl.Insert(k, k))
 			require.NotNil(t, sl.Search(k))
-			require.Equal(t, sl.Search(k), k)
+			require.Equal(t, sl.Search(k).Value(), k)
 			require.NotNil(t, sl.Delete(k))
 			require.Nil(t, sl.Delete(k))
 		}
 
-		// Test get
+		// search
 		for i := 0; i < length; i++ {
-			k := keys[i]
-			v := sl.Search(k)
-			require.NotNil(t, v)
-			require.Equal(t, v, int64(k*2+1))
+			kv := sl.Search(keys[i])
+			require.NotNil(t, kv)
+			require.Equal(t, kv.Value(), int64(keys[i]*2+1))
 		}
 
-		// Test delete
+		// delete
 		for i := 0; i < length; i++ {
-			k := keys[i]
-			require.NotNil(t, sl.Delete(k))
-			require.Nil(t, sl.Delete(k))
+			require.NotNil(t, sl.Delete(keys[i]))
+			require.Nil(t, sl.Delete(keys[i]))
+
+			checkCorrect(t, sl)
+			require.Equal(t, sl.Len(), length-i-1)
 		}
+
+		require.Equal(t, sl.Len(), 0)
+		require.Equal(t, sl.level, 0)
 
 		output(sl)
-		checkCorrect(t, sl)
 
 		for i := 0; i <= maxLevel; i++ {
 			require.Nil(t, sl.head.next[i])
 			require.Equal(t, sl.lens[i], 0)
 		}
 	}
-}
-
-func TestList_Search(t *testing.T) {
-	sl := New()
-
-	// [24, 61, 67, 84, 91, 130, 133, 145, 150]
-	seeds := []container.Int64{24, 61, 67, 84, 91, 130, 133, 145, 150}
-
-	for _, k := range seeds {
-		sl.Insert(k, int64(k*2+1))
-	}
-
-	output(sl)
-
-	var node *listNode
-
-	// --------- [24, 61, 67, 84, 91, 130, 133, 145, 150] ---------
-	node = sl.searchLastLT(container.Int64(21))
-	require.Nil(t, node)
-
-	node = sl.searchLastLT(container.Int64(24))
-	require.Nil(t, node)
-
-	node = sl.searchLastLT(container.Int64(25))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(24))
-
-	node = sl.searchLastLT(container.Int64(77))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(67))
-
-	node = sl.searchLastLT(container.Int64(132))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(130))
-
-	node = sl.searchLastLT(container.Int64(133))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(130))
-
-	node = sl.searchLastLT(container.Int64(146))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(145))
-
-	node = sl.searchLastLT(container.Int64(150))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(145))
-
-	node = sl.searchLastLT(container.Int64(156))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(150))
-
-	// --------- [24, 61, 67, 84, 91, 130, 133, 145, 150] ---------
-	node = sl.searchLastLE(container.Int64(21))
-	require.Nil(t, node)
-
-	node = sl.searchLastLE(container.Int64(24))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(24))
-
-	node = sl.searchLastLE(container.Int64(77))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(67))
-
-	node = sl.searchLastLE(container.Int64(132))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(130))
-
-	node = sl.searchLastLE(container.Int64(133))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(133))
-
-	node = sl.searchLastLE(container.Int64(137))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(133))
-
-	node = sl.searchLastLE(container.Int64(150))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(150))
-
-	node = sl.searchLastLE(container.Int64(156))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(150))
-
-	// --------- [24, 61, 67, 84, 91, 130, 133, 145, 150] ---------
-	node = sl.searchFirstGT(container.Int64(21))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(24))
-
-	node = sl.searchFirstGT(container.Int64(24))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(61))
-
-	node = sl.searchFirstGT(container.Int64(25))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(61))
-
-	node = sl.searchFirstGT(container.Int64(77))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(84))
-
-	node = sl.searchFirstGT(container.Int64(132))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(133))
-
-	node = sl.searchFirstGT(container.Int64(133))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(145))
-
-	node = sl.searchFirstGT(container.Int64(150))
-	require.Nil(t, node)
-	node = sl.searchFirstGT(container.Int64(151))
-	require.Nil(t, node)
-
-	// --------- [24, 61, 67, 84, 91, 130, 133, 145, 150] ---------
-	node = sl.searchFirstGE(container.Int64(21))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(24))
-
-	node = sl.searchFirstGE(container.Int64(24))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(24))
-
-	node = sl.searchFirstGE(container.Int64(25))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(61))
-
-	node = sl.searchFirstGE(container.Int64(77))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(84))
-
-	node = sl.searchFirstGE(container.Int64(132))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(133))
-
-	node = sl.searchFirstGE(container.Int64(133))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(133))
-
-	node = sl.searchFirstGE(container.Int64(146))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(150))
-
-	node = sl.searchFirstGE(container.Int64(150))
-	require.NotNil(t, node)
-	require.Equal(t, node.key, container.Int64(150))
-
-	node = sl.searchFirstGE(container.Int64(151))
-	require.Nil(t, node)
-
-}
-
-func TestList_Iter(t *testing.T) {
-	sl := New()
-
-	// --------- [22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150] ---------
-	seeds := []container.Int64{22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150}
-
-	for _, k := range seeds {
-		sl.Insert(k, int64(k*2+1))
-	}
-
-	output(sl)
-
-	var iter container.Iterator
-	var kv KV
-
-	/* ------ test start == nil && boundary == nil */
-
-	iter = sl.Iter(nil, nil)
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := 0; i < len(seeds); i++ {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	/* ---  test start != nil && boundary == nil --- */
-	//
-	// start < first node
-	iter = sl.Iter(container.Int64(21), nil)
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := 0; i < len(seeds); i++ {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start == first node
-	iter = sl.Iter(container.Int64(22), nil)
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := 0; i < len(seeds); i++ {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start > first node && start < last node
-	iter = sl.Iter(container.Int64(27), nil)
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := 2; i < len(seeds); i++ {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start > first node && start < last node
-	iter = sl.Iter(container.Int64(62), nil)
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := 4; i < len(seeds); i++ {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start > root node && start < last node
-	iter = sl.Iter(container.Int64(132), nil)
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := 12; i < len(seeds); i++ {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start == last node
-	iter = sl.Iter(container.Int64(150), nil)
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	kv = iter.Next()
-	require.Equal(t, kv.Key(), container.Int64(150))
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start > last node
-	iter = sl.Iter(container.Int64(156), nil)
-	require.NotNil(t, iter)
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	/* ---  test start == nil && boundary != nil --- */
-	//
-	// boundary < first node
-	iter = sl.Iter(nil, container.Int64(21))
-	require.NotNil(t, iter)
-	require.False(t, iter.Valid())
-	kv = iter.Next()
-	require.Nil(t, kv)
-
-	// boundary == first node
-	iter = sl.Iter(nil, container.Int64(22))
-	require.NotNil(t, iter)
-	require.False(t, iter.Valid())
-	kv = iter.Next()
-	require.Nil(t, kv)
-
-	// boundary > first node
-	iter = sl.Iter(nil, container.Int64(24))
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	kv = iter.Next()
-	require.Equal(t, kv.Key(), container.Int64(22))
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// boundary < last node && bound > first node
-	iter = sl.Iter(nil, container.Int64(147))
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := 0; i < len(seeds)-1; i++ {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// boundary == last node
-	iter = sl.Iter(nil, container.Int64(150))
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := 0; i < len(seeds)-1; i++ {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// boundary > last node
-	iter = sl.Iter(nil, container.Int64(156))
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := range seeds {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	/* ---  test start != nil && boundary != nil --- */
-	//
-
-	// start < boundary && start > first node && bound < last node
-	iter = sl.Iter(container.Int64(68), container.Int64(132))
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := 6; i < len(seeds)-3; i++ {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start < boundary && start < first node && bound > last node
-	iter = sl.Iter(container.Int64(21), container.Int64(153))
-	require.NotNil(t, iter)
-	require.True(t, iter.Valid())
-	for i := 0; i < len(seeds); i++ {
-		kv := iter.Next()
-		require.NotNil(t, kv, fmt.Sprintf("key %v not found", seeds[i]))
-		require.Equal(t, kv.Key(), seeds[i])
-		require.Equal(t, kv.Value(), int64(seeds[i]*2+1))
-	}
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start == boundary, start and boundary exists.
-	iter = sl.Iter(container.Int64(24), container.Int64(24))
-	require.NotNil(t, iter)
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start == boundary, start and boundary not exists.
-	iter = sl.Iter(container.Int64(25), container.Int64(25))
-	require.NotNil(t, iter)
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start < boundary && start < first node && bound < first node
-	iter = sl.Iter(container.Int64(21), container.Int64(13))
-	require.NotNil(t, iter)
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
-
-	// start > boundary && start > first node
-	iter = sl.Iter(container.Int64(65), container.Int64(27))
-	require.NotNil(t, iter)
-	kv = iter.Next()
-	require.Nil(t, kv)
-	require.False(t, iter.Valid())
 }

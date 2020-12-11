@@ -11,12 +11,10 @@ import (
 // Range interval: ( start <= x < boundary ).
 // We will return data from the beginning if start is nil,
 // And return data util the end if boundary is nil.
-func SearchRange(root Node, start Key, boundary Key) []KV {
+func SearchRange(root Node, start Key, boundary Key, f func(n Node)) {
 	if root == nil {
-		return nil
+		return
 	}
-
-	var result []KV
 
 	s := stack.Default()
 	p := root
@@ -33,17 +31,16 @@ func SearchRange(root Node, start Key, boundary Key) []KV {
 			s.Push(p)
 			p = p.Left()
 		} else {
-			p = s.Pop().(Node)
-			result = append(result, p)
-			p = p.Right()
+			n := s.Pop().(Node)
+			p = n.Right()
+
+			f(n)
 		}
 	}
-
-	return result
 }
 
 // SearchLastLT search for the last node that less than the key.
-func SearchLastLT(root Node, key Key) KV {
+func SearchLastLT(root Node, key Key) Node {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -61,15 +58,11 @@ func SearchLastLT(root Node, key Key) KV {
 		}
 	}
 
-	if n != nil {
-		return n
-	}
-
-	return nil
+	return n
 }
 
 // SearchLastLE search for the last node that less than or equal to the key.
-func SearchLastLE(root Node, key Key) KV {
+func SearchLastLE(root Node, key Key) Node {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -90,15 +83,11 @@ func SearchLastLE(root Node, key Key) KV {
 		}
 	}
 
-	if n != nil {
-		return n
-	}
-
-	return nil
+	return n
 }
 
 // SearchFirstGT search for the first node that greater than to the key.
-func SearchFirstGT(root Node, key Key) KV {
+func SearchFirstGT(root Node, key Key) Node {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -116,15 +105,11 @@ func SearchFirstGT(root Node, key Key) KV {
 		}
 	}
 
-	if n != nil {
-		return n
-	}
-
-	return nil
+	return n
 }
 
 // SearchFirstGE search for the first node that greater than or equal to the key.
-func SearchFirstGE(root Node, key Key) KV {
+func SearchFirstGE(root Node, key Key) Node {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -145,9 +130,5 @@ func SearchFirstGE(root Node, key Key) KV {
 		}
 	}
 
-	if n != nil {
-		return n
-	}
-
-	return nil
+	return n
 }

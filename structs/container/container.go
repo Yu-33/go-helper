@@ -23,13 +23,13 @@ type Container interface {
 	// Returns false if key already exists.
 	Insert(k Key, v Value) bool
 
-	// Delete removes and returns the value of a given key.
+	// Delete removes and returns the KV structure corresponding to the given key.
 	// Returns nil if not found.
-	Delete(k Key) (v Value)
+	Delete(k Key) (kv KV)
 
-	// Search get the value of a given key.
+	// Search returns the KV structure corresponding to the given key.
 	// Returns nil if not found.
-	Search(k Key) (v Value)
+	Search(k Key) (kv KV)
 
 	// Iter creates an iterator to get the data for the specified range.
 	//

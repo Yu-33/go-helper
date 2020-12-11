@@ -8,7 +8,7 @@ import (
 
 // LDR return node by in-order traversal.
 // The order: Left -> Mid -> Right.
-func LDR(root Node, f func(node Node)) {
+func LDR(root Node, f func(n Node)) {
 	if root == nil {
 		return
 	}
@@ -44,7 +44,7 @@ func LDR(root Node, f func(node Node)) {
 
 // DLR return node by pre-order traversal.
 // The order: Mid -> Left -> Right.
-func DLR(root Node, f func(node Node)) {
+func DLR(root Node, f func(n Node)) {
 	if root == nil {
 		return
 	}
@@ -67,7 +67,7 @@ func DLR(root Node, f func(node Node)) {
 
 // LRD return node by post-order traversal.
 // The order: Left -> Right -> Mid.
-func LRD(root Node, f func(node Node)) {
+func LRD(root Node, f func(n Node)) {
 	if root == nil {
 		return
 	}

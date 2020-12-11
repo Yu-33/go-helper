@@ -1,7 +1,6 @@
 package avl
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -32,7 +31,7 @@ func checkBalance(t *testing.T, tr *Tree, n *treeNode) {
 	checkBalance(t, tr, n.left)
 	checkBalance(t, tr, n.right)
 
-	// check node height calculate
+	// Check the node height calculate.
 	require.Equal(t, tr.nodeHeight(n), recurseCalculateNodeHeight(n))
 
 	if n.left != nil {
@@ -42,6 +41,7 @@ func checkBalance(t *testing.T, tr *Tree, n *treeNode) {
 		require.Equal(t, n.key.Compare(n.right.key), -1)
 	}
 
+	// The height difference cannot exceed 1 in AVL Tree.
 	lh := tr.nodeHeight(n.left)
 	rh := tr.nodeHeight(n.right)
 	if lh > rh {
@@ -53,13 +53,13 @@ func checkBalance(t *testing.T, tr *Tree, n *treeNode) {
 
 func Test_Interface(t *testing.T) {
 	// Ensure the interface is implemented.
-	var node bst.Node
+	var n bst.Node
 	var kv container.KV
 	var ct container.Container
 	var it container.Iterator
 
-	node = &treeNode{}
-	_ = node
+	n = &treeNode{}
+	_ = n
 	kv = &treeNode{}
 	_ = kv
 	ct = New()
@@ -72,36 +72,115 @@ func TestNew(t *testing.T) {
 	tr := New()
 	require.NotNil(t, tr)
 	require.Nil(t, tr.root)
-	require.Equal(t, tr.Len(), 0)
+	require.Equal(t, tr.len, 0)
 }
 
-func TestAVLTree_createNode(t *testing.T) {
+func TestTree_createNode(t *testing.T) {
 	tr := New()
 
-	el1 := container.Int64(0xf)
+	k := container.Int64(0xf)
+	v := 1024
 
-	n1 := tr.createNode(el1, 1024)
-	require.NotNil(t, n1)
-	require.Equal(t, n1.key.Compare(el1), 0)
-	require.Equal(t, n1.height, 1)
-	require.Nil(t, n1.left)
-	require.Nil(t, n1.right)
+	n := tr.createNode(k, v)
+	require.NotNil(t, n)
+	require.Equal(t, n.key.Compare(k), 0)
+	require.Equal(t, n.value, v)
+	require.Nil(t, n.left)
+	require.Nil(t, n.right)
+	require.Equal(t, n.height, 1)
 }
 
-func TestAVLTree(t *testing.T) {
+func TestTree_Insert(t *testing.T) {
+	tr := New()
+
+	require.True(t, tr.Insert(container.Int(11), 1024))
+	require.False(t, tr.Insert(container.Int(11), 1023))
+	require.True(t, tr.Insert(container.Int(33), nil))
+	require.False(t, tr.Insert(container.Int(33), nil))
+	require.True(t, tr.Insert(container.Int(22), nil))
+	require.False(t, tr.Insert(container.Int(22), nil))
+}
+
+func TestTree_Delete(t *testing.T) {
+	tr := New()
+	require.True(t, tr.Insert(container.Int(11), 1021))
+	require.True(t, tr.Insert(container.Int(22), 1022))
+	require.True(t, tr.Insert(container.Int(33), 1023))
+
+	kv := tr.Delete(container.Int(11))
+	require.NotNil(t, kv)
+	require.Equal(t, kv.Key().Compare(container.Int(11)), 0)
+	require.Equal(t, kv.Value(), 1021)
+	require.Nil(t, kv.(*treeNode).left)
+	require.Nil(t, kv.(*treeNode).right)
+	require.Equal(t, kv.(*treeNode).height, -1)
+	require.Nil(t, kv.(Node).Left())
+	require.Nil(t, kv.(Node).Left())
+	require.Nil(t, tr.Delete(container.Int(11)))
+
+	require.NotNil(t, tr.Delete(container.Int(22)))
+	require.Nil(t, tr.Delete(container.Int(22)))
+	require.NotNil(t, tr.Delete(container.Int(33)))
+	require.Nil(t, tr.Delete(container.Int(33)))
+
+	// Try to delete key not exists.
+	require.Nil(t, tr.Delete(container.Int(1024)))
+}
+
+func TestTree_Search(t *testing.T) {
+	tr := New()
+	require.True(t, tr.Insert(container.Int(11), 1021))
+	require.True(t, tr.Insert(container.Int(22), 1022))
+	require.True(t, tr.Insert(container.Int(33), 1023))
+
+	require.Equal(t, tr.Search(container.Int(11)).Key().Compare(container.Int(11)), 0)
+	require.Equal(t, tr.Search(container.Int(11)).Value(), 1021)
+	require.Equal(t, tr.Search(container.Int(22)).Key().Compare(container.Int(22)), 0)
+	require.Equal(t, tr.Search(container.Int(22)).Value(), 1022)
+	require.Equal(t, tr.Search(container.Int(33)).Key().Compare(container.Int(33)), 0)
+	require.Equal(t, tr.Search(container.Int(33)).Value(), 1023)
+
+	// Try to search key not exists.
+	require.Nil(t, tr.Search(container.Int(1024)))
+}
+
+func TestTree_Len(t *testing.T) {
+	tr := New()
+
+	require.True(t, tr.Insert(container.Int(12), 1))
+	require.True(t, tr.Insert(container.Int(18), 1))
+	require.True(t, tr.Insert(container.Int(33), 1))
+
+	// Insert duplicate key.
+	require.False(t, tr.Insert(container.Int(12), 1))
+	require.False(t, tr.Insert(container.Int(18), 1))
+	require.False(t, tr.Insert(container.Int(33), 1))
+
+	require.Equal(t, tr.Len(), 3)
+
+	require.NotNil(t, tr.Delete(container.Int(18)))
+	require.Nil(t, tr.Delete(container.Int(18)))
+
+	// Delete a not exist key.
+	require.Nil(t, tr.Delete(container.Int(1024)))
+
+	require.Equal(t, tr.Len(), 2)
+}
+
+func TestTree(t *testing.T) {
 	r := rand.New(rand.NewSource(time.Now().Unix()))
 
 	tr := New()
 
-	length := 259
-	maxKey := length * 10
-	keys := make([]container.Int64, length)
+	length := 257
+	maxKey := length * 100
+	keys := make([]container.Int, length)
 
 	for x := 0; x < 2; x++ {
 		// insert
 		for i := 0; i < length; i++ {
 			for {
-				k := container.Int64(r.Intn(maxKey) + 1)
+				k := container.Int(r.Intn(maxKey) + 1)
 				if ok := tr.Insert(k, int64(k*2+1)); ok {
 					require.False(t, tr.Insert(k, int64(k*2+1)))
 					keys[i] = k
@@ -109,25 +188,27 @@ func TestAVLTree(t *testing.T) {
 				}
 			}
 			checkBalance(t, tr, tr.root)
+			require.Equal(t, tr.Len(), i+1)
 		}
 
 		require.Equal(t, tr.Len(), length)
 
 		// boundary
-		for _, k := range []container.Int64{0, 0xfffffff} {
+		for _, k := range []container.Int{0, 0xfffffff} {
 			require.True(t, tr.Insert(k, k))
 			require.False(t, tr.Insert(k, k))
 			require.NotNil(t, tr.Search(k))
-			require.Equal(t, tr.Search(k), k)
+			require.Equal(t, tr.Search(k).Value(), k)
 			require.NotNil(t, tr.Delete(k))
 			require.Nil(t, tr.Delete(k))
 		}
 
 		// get
 		for i := 0; i < length; i++ {
-			n := tr.Search(keys[i])
-			require.NotNil(t, n, fmt.Sprintf("key %d not found", keys[i]))
-			require.Equal(t, n, int64(keys[i]*2+1))
+			kv := tr.Search(keys[i])
+			require.NotNil(t, kv)
+			require.Equal(t, kv.Key().Compare(keys[i]), 0)
+			require.Equal(t, kv.Value(), int64(keys[i]*2+1))
 		}
 
 		// delete
@@ -135,8 +216,11 @@ func TestAVLTree(t *testing.T) {
 			require.NotNil(t, tr.Delete(keys[i]))
 			require.Nil(t, tr.Delete(keys[i]))
 			require.Nil(t, tr.Search(keys[i]))
+
 			checkBalance(t, tr, tr.root)
+			require.Equal(t, tr.Len(), length-i-1)
 		}
+
 		require.Nil(t, tr.root)
 		require.Equal(t, tr.Len(), 0)
 	}

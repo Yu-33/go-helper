@@ -12,6 +12,9 @@ const (
 
 type Key = container.Key
 type Value = container.Value
+type KV = container.KV
+
+type Node = bst.Node
 
 // treeNode is used for Red-Black Tree.
 //
@@ -36,12 +39,12 @@ func (n *treeNode) Value() Value {
 }
 
 // Left returns the left child of the Node.
-func (n *treeNode) Left() bst.Node {
+func (n *treeNode) Left() Node {
 	return n.left
 }
 
 // Right returns the right child of the Node.
-func (n *treeNode) Right() bst.Node {
+func (n *treeNode) Right() Node {
 	return n.right
 }
 
@@ -103,9 +106,9 @@ func (tr *Tree) Insert(k Key, v Value) bool {
 	return true
 }
 
-// Delete removes and returns the value of a given key.
+// Delete removes and returns the KV structure corresponding to the given key.
 // Returns nil if not found.
-func (tr *Tree) Delete(k Key) Value {
+func (tr *Tree) Delete(k Key) KV {
 	d := tr.root
 	for d != nil {
 		flag := k.Compare(d.key)
@@ -154,13 +157,18 @@ func (tr *Tree) Delete(k Key) Value {
 		tr.deleteBalance(c, d.parent)
 	}
 
+	d.left = nil
+	d.right = nil
+	d.parent = nil
+	d.color = -1
+
 	tr.len--
-	return d.value
+	return d
 }
 
-// Search get the value of a given key.
+// Search returns the KV structure corresponding to the given key.
 // Returns nil if not found.
-func (tr *Tree) Search(k Key) Value {
+func (tr *Tree) Search(k Key) KV {
 	p := tr.root
 	for p != nil {
 		flag := k.Compare(p.key)
@@ -169,7 +177,7 @@ func (tr *Tree) Search(k Key) Value {
 		} else if flag == 1 {
 			p = p.right
 		} else {
-			return p.value
+			return p
 		}
 	}
 	return nil
@@ -177,8 +185,7 @@ func (tr *Tree) Search(k Key) Value {
 
 // Iter return an Iterator, it's a wrap for bst.Iterator.
 func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
-	it := bst.NewIterator(tr.root, start, boundary)
-	return it
+	return bst.NewIterator(tr.root, start, boundary)
 }
 
 func (tr *Tree) swap(n1, n2 *treeNode) {
