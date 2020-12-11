@@ -37,12 +37,12 @@ func checkCorrect(t *testing.T, sl *List) {
 
 func Test_Interface(t *testing.T) {
 	// Ensure the interface is implemented.
-	var kv container.KV
+	var element container.Element
 	var ct container.Container
 	var it container.Iterator
 
-	kv = &listNode{}
-	_ = kv
+	element = &listNode{}
+	_ = element
 	ct = New()
 	_ = ct
 	it = ct.Iter(nil, nil)
@@ -100,11 +100,11 @@ func TestList_Delete(t *testing.T) {
 	require.NotNil(t, sl.Insert(container.Int(22), 1022))
 	require.NotNil(t, sl.Insert(container.Int(33), 1023))
 
-	kv := sl.Delete(container.Int(11))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key().Compare(container.Int(11)), 0)
-	require.Equal(t, kv.Value(), 1021)
-	require.Nil(t, kv.(*listNode).next)
+	element := sl.Delete(container.Int(11))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key().Compare(container.Int(11)), 0)
+	require.Equal(t, element.Value(), 1021)
+	require.Nil(t, element.(*listNode).next)
 	require.Nil(t, sl.Delete(container.Int(11)))
 
 	require.NotNil(t, sl.Delete(container.Int(22)))
@@ -172,9 +172,9 @@ func TestList(t *testing.T) {
 
 		// search
 		for i := 0; i < length; i++ {
-			kv := sl.Search(keys[i])
-			require.NotNil(t, kv)
-			require.Equal(t, kv.Value(), int64(keys[i]*2+1))
+			element := sl.Search(keys[i])
+			require.NotNil(t, element)
+			require.Equal(t, element.Value(), int64(keys[i]*2+1))
 		}
 
 		// delete

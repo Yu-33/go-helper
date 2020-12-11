@@ -6,11 +6,12 @@ type Key = Comparator
 // Value represents high-level Value type.
 type Value interface{}
 
-// KV defines an interface to describe k/v pair.
-type KV interface {
-	// Key returns the key.
+// Element is an element of a Container.
+type Element interface {
+	// Key returns the key that stored with this element.
 	Key() Key
-	// Value returns the value.
+
+	// Value returns the value that stored with this element.
 	Value() Value
 }
 
@@ -19,32 +20,32 @@ type Container interface {
 	// Len returns the number of elements.
 	Len() int
 
-	// Insert inserts the giving key and value and returns the KV structure.
+	// Insert inserts the giving key and value as an Element and return.
 	// Returns nil if key already exists.
-	Insert(k Key, v Value) (kv KV)
+	Insert(k Key, v Value) (element Element)
 
-	// Delete removes and returns the KV structure corresponding to the given key.
+	// Delete removes and returns the Element of a given key.
 	// Returns nil if not found.
-	Delete(k Key) (kv KV)
+	Delete(k Key) (element Element)
 
-	// Search returns the KV structure corresponding to the given key.
+	// Search returns the Element of a given key.
 	// Returns nil if not found.
-	Search(k Key) (kv KV)
+	Search(k Key) (element Element)
 
-	// Iter creates an iterator to get the data for the specified range.
+	// Iter creates an iterator to iteration return element.
 	//
-	// Range interval: ( start <= x < boundary ).
-	// We will return data from the beginning if start is nil,
-	// And return data util the end if boundary is nil.
+	// The element range is start <= x < boundary.
+	// The element will return from the beginning if start is nil,
+	// And return until the end if the boundary is nil.
 	Iter(start Key, boundary Key) Iterator
 }
 
-// Iterator defines an iterator interface to returns multiple data.
+// The iterator is an interface for iteration return element.
 type Iterator interface {
 	// Valid represents whether to have more elements in the Iterator.
 	Valid() bool
 
-	// Next returns a k/v pair and moved the iterator to the next pair.
+	// Next returns a Element and moved the iterator to the next Element.
 	// Returns nil if no more elements.
-	Next() KV
+	Next() Element
 }

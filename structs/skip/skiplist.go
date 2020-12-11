@@ -9,7 +9,7 @@ import (
 
 type Key = container.Key
 type Value = container.Value
-type KV = container.KV
+type Element = container.Element
 
 const (
 	maxLevel = 0x1f
@@ -17,7 +17,7 @@ const (
 
 // listNode is used for Skip List.
 //
-// And it is also the implementation of interface container.KV.
+// And it is also the implementation of interface container.Element.
 type listNode struct {
 	key   Key
 	value Value
@@ -59,9 +59,9 @@ func (sl *List) Len() int {
 	return sl.lens[0]
 }
 
-// Insert inserts the giving key and value and returns the KV structure.
+// Insert inserts the giving key and value as an Element and return.
 // Returns nil if key already exists.
-func (sl *List) Insert(k Key, v Value) KV {
+func (sl *List) Insert(k Key, v Value) Element {
 	var updates [maxLevel + 1]*listNode
 
 	level := sl.chooseLevel()
@@ -91,9 +91,9 @@ func (sl *List) Insert(k Key, v Value) KV {
 	return node
 }
 
-// Delete removes and returns the KV structure corresponding to the given key.
+// Delete removes and returns the Element of a given key.
 // Returns nil if not found.
-func (sl *List) Delete(k Key) KV {
+func (sl *List) Delete(k Key) Element {
 	var d *listNode
 	p := sl.head
 
@@ -123,9 +123,9 @@ func (sl *List) Delete(k Key) KV {
 	return d
 }
 
-// Search returns the KV structure corresponding to the given key.
+// Search returns the Element of a given key.
 // Returns nil if not found.
-func (sl *List) Search(k Key) KV {
+func (sl *List) Search(k Key) Element {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {

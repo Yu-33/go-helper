@@ -32,13 +32,13 @@ func buildBSTree() (tr *Tree) {
 func TestLDR(t *testing.T) {
 	tr := buildBSTree()
 
-	var r1 []KV
+	var r1 []Element
 	LDR(tr.root, func(n Node) {
 		r1 = append(r1, n)
 	})
 
 	var f func(node *treeNode)
-	var r2 []KV
+	var r2 []Element
 	f = func(node *treeNode) {
 		if node == nil {
 			return
@@ -55,13 +55,13 @@ func TestLDR(t *testing.T) {
 func TestDLR(t *testing.T) {
 	tr := buildBSTree()
 
-	var r1 []KV
+	var r1 []Element
 	DLR(tr.root, func(n Node) {
 		r1 = append(r1, n)
 	})
 
 	var f func(node *treeNode)
-	var r2 []KV
+	var r2 []Element
 	f = func(node *treeNode) {
 		if node == nil {
 			return
@@ -78,13 +78,13 @@ func TestDLR(t *testing.T) {
 func TestLRD(t *testing.T) {
 	tr := buildBSTree()
 
-	var r1 []KV
+	var r1 []Element
 	LRD(tr.root, func(n Node) {
 		r1 = append(r1, n)
 	})
 
 	var f func(node *treeNode)
-	var r2 []KV
+	var r2 []Element
 	f = func(node *treeNode) {
 		if node == nil {
 			return

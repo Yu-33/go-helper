@@ -19,8 +19,8 @@ func newIterTopo(g *DAG) *IterTopo {
 	// Init the iterator.
 	vexIt := g.vertexes.Iter(nil, nil)
 	for vexIt.Valid() {
-		kv := vexIt.Next()
-		vex := kv.Value().(*Vertex)
+		element := vexIt.Next()
+		vex := element.Value().(*Vertex)
 
 		degree := vex.in.Len()
 		if degree == 0 {
@@ -80,8 +80,8 @@ func (it *IterTopo) Batch() []*Vertex {
 func (it *IterTopo) fillQueue(vex *Vertex) {
 	itOut := vex.out.Iter(nil, nil)
 	for itOut.Valid() {
-		kv := itOut.Next()
-		vex := kv.Value().(*Vertex)
+		element := itOut.Next()
+		vex := element.Value().(*Vertex)
 
 		it.inDegrees[vex]--
 		if it.inDegrees[vex] == 0 {

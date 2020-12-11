@@ -6,11 +6,11 @@ import (
 
 type Key = container.Key
 type Value = container.Value
-type KV = container.KV
+type Element = container.Element
 
 // Node defines an interface of binary tree node type.
 type Node interface {
-	KV
+	Element
 	// Left returns the left child of the Node.
 	Left() Node
 	// Right returns the right child of the Node.

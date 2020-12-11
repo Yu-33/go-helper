@@ -53,15 +53,15 @@ func checkBalance(t *testing.T, tr *Tree, n *treeNode) {
 
 func Test_Interface(t *testing.T) {
 	// Ensure the interface is implemented.
-	var n bst.Node
-	var kv container.KV
+	var node bst.Node
+	var element container.Element
 	var ct container.Container
 	var it container.Iterator
 
-	n = &treeNode{}
-	_ = n
-	kv = &treeNode{}
-	_ = kv
+	node = &treeNode{}
+	_ = node
+	element = &treeNode{}
+	_ = element
 	ct = New()
 	_ = ct
 	it = ct.Iter(nil, nil)
@@ -107,15 +107,15 @@ func TestTree_Delete(t *testing.T) {
 	require.NotNil(t, tr.Insert(container.Int(22), 1022))
 	require.NotNil(t, tr.Insert(container.Int(33), 1023))
 
-	kv := tr.Delete(container.Int(11))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key().Compare(container.Int(11)), 0)
-	require.Equal(t, kv.Value(), 1021)
-	require.Nil(t, kv.(*treeNode).left)
-	require.Nil(t, kv.(*treeNode).right)
-	require.Equal(t, kv.(*treeNode).height, -1)
-	require.Nil(t, kv.(Node).Left())
-	require.Nil(t, kv.(Node).Left())
+	element := tr.Delete(container.Int(11))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key().Compare(container.Int(11)), 0)
+	require.Equal(t, element.Value(), 1021)
+	require.Nil(t, element.(*treeNode).left)
+	require.Nil(t, element.(*treeNode).right)
+	require.Equal(t, element.(*treeNode).height, -1)
+	require.Nil(t, element.(Node).Left())
+	require.Nil(t, element.(Node).Left())
 	require.Nil(t, tr.Delete(container.Int(11)))
 
 	require.NotNil(t, tr.Delete(container.Int(22)))
@@ -205,10 +205,10 @@ func TestTree(t *testing.T) {
 
 		// get
 		for i := 0; i < length; i++ {
-			kv := tr.Search(keys[i])
-			require.NotNil(t, kv)
-			require.Equal(t, kv.Key().Compare(keys[i]), 0)
-			require.Equal(t, kv.Value(), int64(keys[i]*2+1))
+			element := tr.Search(keys[i])
+			require.NotNil(t, element)
+			require.Equal(t, element.Key().Compare(keys[i]), 0)
+			require.Equal(t, element.Value(), int64(keys[i]*2+1))
 		}
 
 		// delete

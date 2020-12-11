@@ -39,20 +39,20 @@ func (g *DAG) AddVertex(k Key, v Value) bool {
 // DelVertex removes the vertex by giving key and returns its value.
 // Returns nil if vertex not exists.
 func (g *DAG) DelVertex(k Key) Value {
-	kv := g.vertexes.Delete(k)
-	if kv == nil {
+	element := g.vertexes.Delete(k)
+	if element == nil {
 		return nil
 	}
 
-	vex := kv.Value().(*Vertex)
+	vex := element.Value().(*Vertex)
 	vex.in = nil
 	vex.out = nil
 
 	// Delete edges form other vertices that attach to this vertex.
 	it := g.vertexes.Iter(nil, nil)
 	for it.Valid() {
-		kv := it.Next()
-		vt := kv.Value().(*Vertex)
+		element := it.Next()
+		vt := element.Value().(*Vertex)
 		_ = vt.in.Delete(k)
 		_ = vt.out.Delete(k)
 	}
@@ -62,11 +62,11 @@ func (g *DAG) DelVertex(k Key) Value {
 
 // GetVertex get the value of a given key.
 func (g *DAG) GetVertex(k Key) Value {
-	kv := g.vertexes.Search(k)
-	if kv == nil {
+	element := g.vertexes.Search(k)
+	if element == nil {
 		return nil
 	}
-	return kv.Value().(*Vertex).value
+	return element.Value().(*Vertex).value
 }
 
 // AddEdge attaches an edge from vertex to adjacency.
@@ -76,22 +76,23 @@ func (g *DAG) GetVertex(k Key) Value {
 // And will be crashing in following cases:
 //   - vertex equal to adjacency.
 //   - vertex or adjacency does not exist.
+// FIXME: refactor error process.
 func (g *DAG) AddEdge(vex, adj Key) bool {
 	if vex.Compare(adj) == 0 {
 		panic("dag:AddEdge: vertex can not equal to adjacency")
 	}
 
-	kv1 := g.vertexes.Search(vex)
-	if kv1 == nil {
+	e1 := g.vertexes.Search(vex)
+	if e1 == nil {
 		panic("dag:AddEdge: vertex not exists")
 	}
-	kv2 := g.vertexes.Search(adj)
-	if kv2 == nil {
+	e2 := g.vertexes.Search(adj)
+	if e2 == nil {
 		panic("dag:AddEdge: adjacency not exists")
 	}
 
-	vex1 := kv1.Value().(*Vertex)
-	vex2 := kv2.Value().(*Vertex)
+	vex1 := e1.Value().(*Vertex)
+	vex2 := e2.Value().(*Vertex)
 
 	// FIXME: refactor it.
 	// Check whether has ring.
@@ -109,8 +110,8 @@ func (g *DAG) AddEdge(vex, adj Key) bool {
 
 		it := n.out.Iter(nil, nil)
 		for it.Valid() {
-			kv := it.Next()
-			s.Push([]interface{}{kv.Key(), kv.Value()})
+			element := it.Next()
+			s.Push([]interface{}{element.Key(), element.Value()})
 		}
 	}
 
@@ -127,24 +128,25 @@ func (g *DAG) AddEdge(vex, adj Key) bool {
 // And will be crashing in following cases:
 //   - vertex equal to adjacency.
 //   - vertex or adjacency does not exist.
+// FIXME: refactor error process.
 func (g *DAG) DelEdge(vex, adj Key) bool {
 	if vex.Compare(adj) == 0 {
 		panic("dag:DelEdge: vertex can not equal to adjacency")
 	}
 
-	kv1 := g.vertexes.Search(vex)
-	if kv1 == nil {
+	e1 := g.vertexes.Search(vex)
+	if e1 == nil {
 		panic("dag:DelEdge: vertex not exists")
 	}
-	kv2 := g.vertexes.Search(adj)
-	if kv2 == nil {
+	e2 := g.vertexes.Search(adj)
+	if e2 == nil {
 		panic("dag:DelEdge: adjacency not exists")
 	}
 
-	if kv := kv1.Value().(*Vertex).out.Delete(adj); kv == nil {
+	if element := e1.Value().(*Vertex).out.Delete(adj); element == nil {
 		return false
 	}
-	if kv := kv2.Value().(*Vertex).in.Delete(vex); kv == nil {
+	if element := e2.Value().(*Vertex).in.Delete(vex); element == nil {
 		return false
 	}
 

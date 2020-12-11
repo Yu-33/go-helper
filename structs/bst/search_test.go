@@ -8,8 +8,8 @@ import (
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
-func searchRange(root Node, start Key, boundary Key) []KV {
-	var result []KV
+func searchRange(root Node, start Key, boundary Key) []Element {
+	var result []Element
 
 	SearchRange(root, start, boundary, func(n Node) {
 		result = append(result, n)
@@ -18,12 +18,12 @@ func searchRange(root Node, start Key, boundary Key) []KV {
 	return result
 }
 
-func searchRangeByRecursion(root *treeNode, start Key, boundary Key) []KV {
+func searchRangeByRecursion(root *treeNode, start Key, boundary Key) []Element {
 	if root == nil {
 		return nil
 	}
 
-	var result []KV
+	var result []Element
 
 	var recursion func(n *treeNode, start Key, boundary Key)
 
@@ -48,12 +48,12 @@ func searchRangeByRecursion(root *treeNode, start Key, boundary Key) []KV {
 	return result
 }
 
-func searchRangeByIter(root *treeNode, start Key, boundary Key) []KV {
+func searchRangeByIter(root *treeNode, start Key, boundary Key) []Element {
 	if root == nil {
 		return nil
 	}
 
-	var result []KV
+	var result []Element
 
 	it := NewIterator(root, start, boundary)
 	for it.Valid() {
@@ -74,7 +74,7 @@ func TestSearchRange(t *testing.T) {
 
 	// seeds sequence in tree by in order: 22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150
 
-	var r1, r2, r3 []KV
+	var r1, r2, r3 []Element
 
 	/* ------ test start == nil && boundary == nil */
 
@@ -231,7 +231,7 @@ func TestSearchLastLT(t *testing.T) {
 		tr.Insert(k, int64(k*2+1))
 	}
 
-	var kv KV
+	var element Element
 
 	// --------- [22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150] ---------
 	/*
@@ -241,61 +241,61 @@ func TestSearchLastLT(t *testing.T) {
 		22        35       64        76       87        97       133         150
 	*/
 
-	kv = SearchLastLT(tr.root, container.Int64(21))
-	require.Nil(t, kv)
+	element = SearchLastLT(tr.root, container.Int64(21))
+	require.Nil(t, element)
 
-	kv = SearchLastLT(tr.root, container.Int64(22))
-	require.Nil(t, kv)
+	element = SearchLastLT(tr.root, container.Int64(22))
+	require.Nil(t, element)
 
-	kv = SearchLastLT(tr.root, container.Int64(25))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(24))
-	require.Equal(t, kv.Value(), int64(24*2+1))
+	element = SearchLastLT(tr.root, container.Int64(25))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(24))
+	require.Equal(t, element.Value(), int64(24*2+1))
 
-	kv = SearchLastLT(tr.root, container.Int64(63))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(61))
-	require.Equal(t, kv.Value(), int64(61*2+1))
+	element = SearchLastLT(tr.root, container.Int64(63))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(61))
+	require.Equal(t, element.Value(), int64(61*2+1))
 
-	kv = SearchLastLT(tr.root, container.Int64(77))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(76))
-	require.Equal(t, kv.Value(), int64(76*2+1))
+	element = SearchLastLT(tr.root, container.Int64(77))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(76))
+	require.Equal(t, element.Value(), int64(76*2+1))
 
-	kv = SearchLastLT(tr.root, container.Int64(84))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(76))
-	require.Equal(t, kv.Value(), int64(76*2+1))
+	element = SearchLastLT(tr.root, container.Int64(84))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(76))
+	require.Equal(t, element.Value(), int64(76*2+1))
 
-	kv = SearchLastLT(tr.root, container.Int64(99))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(97))
-	require.Equal(t, kv.Value(), int64(97*2+1))
+	element = SearchLastLT(tr.root, container.Int64(99))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(97))
+	require.Equal(t, element.Value(), int64(97*2+1))
 
-	kv = SearchLastLT(tr.root, container.Int64(132))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(130))
-	require.Equal(t, kv.Value(), int64(130*2+1))
+	element = SearchLastLT(tr.root, container.Int64(132))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(130))
+	require.Equal(t, element.Value(), int64(130*2+1))
 
-	kv = SearchLastLT(tr.root, container.Int64(133))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(130))
-	require.Equal(t, kv.Value(), int64(130*2+1))
+	element = SearchLastLT(tr.root, container.Int64(133))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(130))
+	require.Equal(t, element.Value(), int64(130*2+1))
 
-	kv = SearchLastLT(tr.root, container.Int64(146))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(145))
-	require.Equal(t, kv.Value(), int64(145*2+1))
+	element = SearchLastLT(tr.root, container.Int64(146))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(145))
+	require.Equal(t, element.Value(), int64(145*2+1))
 
-	kv = SearchLastLT(tr.root, container.Int64(150))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(145))
-	require.Equal(t, kv.Value(), int64(145*2+1))
+	element = SearchLastLT(tr.root, container.Int64(150))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(145))
+	require.Equal(t, element.Value(), int64(145*2+1))
 
-	kv = SearchLastLT(tr.root, container.Int64(156))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(150))
-	require.Equal(t, kv.Value(), int64(150*2+1))
+	element = SearchLastLT(tr.root, container.Int64(156))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(150))
+	require.Equal(t, element.Value(), int64(150*2+1))
 }
 
 func TestSearchLastLE(t *testing.T) {
@@ -310,7 +310,7 @@ func TestSearchLastLE(t *testing.T) {
 		tr.Insert(k, int64(k*2+1))
 	}
 
-	var kv KV
+	var element Element
 
 	// --------- [22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150] ---------
 	/*
@@ -320,63 +320,63 @@ func TestSearchLastLE(t *testing.T) {
 		22        35       64        76       87        97       133         150
 	*/
 
-	kv = SearchLastLE(tr.root, container.Int64(21))
-	require.Nil(t, kv)
+	element = SearchLastLE(tr.root, container.Int64(21))
+	require.Nil(t, element)
 
-	kv = SearchLastLE(tr.root, container.Int64(22))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(22))
-	require.Equal(t, kv.Value(), int64(22*2+1))
+	element = SearchLastLE(tr.root, container.Int64(22))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(22))
+	require.Equal(t, element.Value(), int64(22*2+1))
 
-	kv = SearchLastLE(tr.root, container.Int64(25))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(24))
-	require.Equal(t, kv.Value(), int64(24*2+1))
+	element = SearchLastLE(tr.root, container.Int64(25))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(24))
+	require.Equal(t, element.Value(), int64(24*2+1))
 
-	kv = SearchLastLE(tr.root, container.Int64(63))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(61))
-	require.Equal(t, kv.Value(), int64(61*2+1))
+	element = SearchLastLE(tr.root, container.Int64(63))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(61))
+	require.Equal(t, element.Value(), int64(61*2+1))
 
-	kv = SearchLastLE(tr.root, container.Int64(77))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(76))
-	require.Equal(t, kv.Value(), int64(76*2+1))
+	element = SearchLastLE(tr.root, container.Int64(77))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(76))
+	require.Equal(t, element.Value(), int64(76*2+1))
 
-	kv = SearchLastLE(tr.root, container.Int64(76))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(76))
-	require.Equal(t, kv.Value(), int64(76*2+1))
+	element = SearchLastLE(tr.root, container.Int64(76))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(76))
+	require.Equal(t, element.Value(), int64(76*2+1))
 
-	kv = SearchLastLE(tr.root, container.Int64(99))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(97))
-	require.Equal(t, kv.Value(), int64(97*2+1))
+	element = SearchLastLE(tr.root, container.Int64(99))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(97))
+	require.Equal(t, element.Value(), int64(97*2+1))
 
-	kv = SearchLastLE(tr.root, container.Int64(132))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(130))
-	require.Equal(t, kv.Value(), int64(130*2+1))
+	element = SearchLastLE(tr.root, container.Int64(132))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(130))
+	require.Equal(t, element.Value(), int64(130*2+1))
 
-	kv = SearchLastLE(tr.root, container.Int64(133))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(133))
-	require.Equal(t, kv.Value(), int64(133*2+1))
+	element = SearchLastLE(tr.root, container.Int64(133))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(133))
+	require.Equal(t, element.Value(), int64(133*2+1))
 
-	kv = SearchLastLE(tr.root, container.Int64(146))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(145))
-	require.Equal(t, kv.Value(), int64(145*2+1))
+	element = SearchLastLE(tr.root, container.Int64(146))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(145))
+	require.Equal(t, element.Value(), int64(145*2+1))
 
-	kv = SearchLastLE(tr.root, container.Int64(150))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(150))
-	require.Equal(t, kv.Value(), int64(150*2+1))
+	element = SearchLastLE(tr.root, container.Int64(150))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(150))
+	require.Equal(t, element.Value(), int64(150*2+1))
 
-	kv = SearchLastLE(tr.root, container.Int64(156))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(150))
-	require.Equal(t, kv.Value(), int64(150*2+1))
+	element = SearchLastLE(tr.root, container.Int64(156))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(150))
+	require.Equal(t, element.Value(), int64(150*2+1))
 }
 
 func TestSearchFirstGT(t *testing.T) {
@@ -391,7 +391,7 @@ func TestSearchFirstGT(t *testing.T) {
 		tr.Insert(k, int64(k*2+1))
 	}
 
-	var kv KV
+	var element Element
 
 	// --------- [22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150] ---------
 	/*
@@ -401,55 +401,55 @@ func TestSearchFirstGT(t *testing.T) {
 		22        35       64        76       87        97       133         150
 	*/
 
-	kv = SearchFirstGT(tr.root, container.Int64(21))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(22))
-	require.Equal(t, kv.Value(), int64(22*2+1))
+	element = SearchFirstGT(tr.root, container.Int64(21))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(22))
+	require.Equal(t, element.Value(), int64(22*2+1))
 
-	kv = SearchFirstGT(tr.root, container.Int64(24))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(35))
-	require.Equal(t, kv.Value(), int64(35*2+1))
+	element = SearchFirstGT(tr.root, container.Int64(24))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(35))
+	require.Equal(t, element.Value(), int64(35*2+1))
 
-	kv = SearchFirstGT(tr.root, container.Int64(25))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(35))
-	require.Equal(t, kv.Value(), int64(35*2+1))
+	element = SearchFirstGT(tr.root, container.Int64(25))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(35))
+	require.Equal(t, element.Value(), int64(35*2+1))
 
-	kv = SearchFirstGT(tr.root, container.Int64(63))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(64))
-	require.Equal(t, kv.Value(), int64(64*2+1))
+	element = SearchFirstGT(tr.root, container.Int64(63))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(64))
+	require.Equal(t, element.Value(), int64(64*2+1))
 
-	kv = SearchFirstGT(tr.root, container.Int64(77))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(84))
-	require.Equal(t, kv.Value(), int64(84*2+1))
+	element = SearchFirstGT(tr.root, container.Int64(77))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(84))
+	require.Equal(t, element.Value(), int64(84*2+1))
 
-	kv = SearchFirstGT(tr.root, container.Int64(99))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(130))
-	require.Equal(t, kv.Value(), int64(130*2+1))
+	element = SearchFirstGT(tr.root, container.Int64(99))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(130))
+	require.Equal(t, element.Value(), int64(130*2+1))
 
-	kv = SearchFirstGT(tr.root, container.Int64(132))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(133))
-	require.Equal(t, kv.Value(), int64(133*2+1))
+	element = SearchFirstGT(tr.root, container.Int64(132))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(133))
+	require.Equal(t, element.Value(), int64(133*2+1))
 
-	kv = SearchFirstGT(tr.root, container.Int64(133))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(145))
-	require.Equal(t, kv.Value(), int64(145*2+1))
+	element = SearchFirstGT(tr.root, container.Int64(133))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(145))
+	require.Equal(t, element.Value(), int64(145*2+1))
 
-	kv = SearchFirstGT(tr.root, container.Int64(147))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(150))
-	require.Equal(t, kv.Value(), int64(150*2+1))
+	element = SearchFirstGT(tr.root, container.Int64(147))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(150))
+	require.Equal(t, element.Value(), int64(150*2+1))
 
-	kv = SearchFirstGT(tr.root, container.Int64(150))
-	require.Nil(t, kv)
-	kv = SearchFirstGT(tr.root, container.Int64(151))
-	require.Nil(t, kv)
+	element = SearchFirstGT(tr.root, container.Int64(150))
+	require.Nil(t, element)
+	element = SearchFirstGT(tr.root, container.Int64(151))
+	require.Nil(t, element)
 }
 
 func TestSearchFirstGE(t *testing.T) {
@@ -464,7 +464,7 @@ func TestSearchFirstGE(t *testing.T) {
 		tr.Insert(k, int64(k*2+1))
 	}
 
-	var kv KV
+	var element Element
 
 	// --------- [22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150] ---------
 	/*
@@ -474,56 +474,56 @@ func TestSearchFirstGE(t *testing.T) {
 		22        35       64        76       87        97       133         150
 	*/
 
-	kv = SearchFirstGE(tr.root, container.Int64(21))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(22))
-	require.Equal(t, kv.Value(), int64(22*2+1))
+	element = SearchFirstGE(tr.root, container.Int64(21))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(22))
+	require.Equal(t, element.Value(), int64(22*2+1))
 
-	kv = SearchFirstGE(tr.root, container.Int64(24))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(24))
-	require.Equal(t, kv.Value(), int64(24*2+1))
+	element = SearchFirstGE(tr.root, container.Int64(24))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(24))
+	require.Equal(t, element.Value(), int64(24*2+1))
 
-	kv = SearchFirstGE(tr.root, container.Int64(25))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(35))
-	require.Equal(t, kv.Value(), int64(35*2+1))
+	element = SearchFirstGE(tr.root, container.Int64(25))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(35))
+	require.Equal(t, element.Value(), int64(35*2+1))
 
-	kv = SearchFirstGE(tr.root, container.Int64(63))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(64))
-	require.Equal(t, kv.Value(), int64(64*2+1))
+	element = SearchFirstGE(tr.root, container.Int64(63))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(64))
+	require.Equal(t, element.Value(), int64(64*2+1))
 
-	kv = SearchFirstGE(tr.root, container.Int64(77))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(84))
-	require.Equal(t, kv.Value(), int64(84*2+1))
+	element = SearchFirstGE(tr.root, container.Int64(77))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(84))
+	require.Equal(t, element.Value(), int64(84*2+1))
 
-	kv = SearchFirstGE(tr.root, container.Int64(99))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(130))
-	require.Equal(t, kv.Value(), int64(130*2+1))
+	element = SearchFirstGE(tr.root, container.Int64(99))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(130))
+	require.Equal(t, element.Value(), int64(130*2+1))
 
-	kv = SearchFirstGE(tr.root, container.Int64(132))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(133))
-	require.Equal(t, kv.Value(), int64(133*2+1))
+	element = SearchFirstGE(tr.root, container.Int64(132))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(133))
+	require.Equal(t, element.Value(), int64(133*2+1))
 
-	kv = SearchFirstGE(tr.root, container.Int64(133))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(133))
-	require.Equal(t, kv.Value(), int64(133*2+1))
+	element = SearchFirstGE(tr.root, container.Int64(133))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(133))
+	require.Equal(t, element.Value(), int64(133*2+1))
 
-	kv = SearchFirstGE(tr.root, container.Int64(146))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(150))
-	require.Equal(t, kv.Value(), int64(150*2+1))
+	element = SearchFirstGE(tr.root, container.Int64(146))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(150))
+	require.Equal(t, element.Value(), int64(150*2+1))
 
-	kv = SearchFirstGE(tr.root, container.Int64(150))
-	require.NotNil(t, kv)
-	require.Equal(t, kv.Key(), container.Int64(150))
-	require.Equal(t, kv.Value(), int64(150*2+1))
+	element = SearchFirstGE(tr.root, container.Int64(150))
+	require.NotNil(t, element)
+	require.Equal(t, element.Key(), container.Int64(150))
+	require.Equal(t, element.Value(), int64(150*2+1))
 
-	kv = SearchFirstGE(tr.root, container.Int64(151))
-	require.Nil(t, kv)
+	element = SearchFirstGE(tr.root, container.Int64(151))
+	require.Nil(t, element)
 }

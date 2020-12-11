@@ -1,10 +1,10 @@
 package skip
 
-// Iterator to get the data for the specified range.
+// Iterator to iteration return element.
 //
-// Range interval: ( start <= x < boundary ).
-// We will return data from the beginning if start is nil,
-// And return data util the end if boundary is nil.
+// The element range is start <= x < boundary.
+// The element will return from the beginning if start is nil,
+// And return until the end if the boundary is nil.
 //
 // And it is also the implementation of interface container.Iterator
 type Iterator struct {
@@ -44,9 +44,9 @@ func (iter *Iterator) Valid() bool {
 	return true
 }
 
-// Next returns a k/v pair and moved the iterator to the next pair.
+// Next returns a Element and moved the iterator to the next Element.
 // Returns nil if no more elements.
-func (iter *Iterator) Next() KV {
+func (iter *Iterator) Next() Element {
 	if !iter.Valid() {
 		return nil
 	}

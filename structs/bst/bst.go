@@ -6,7 +6,7 @@ import (
 
 // treeNode is used for Binary Search Tree.
 //
-// And it is also the implementation of interface container.KV and bst.Node
+// And it is also the implementation of interface container.Element and bst.Node
 type treeNode struct {
 	key   Key
 	value Value
@@ -56,9 +56,9 @@ func (tr *Tree) Len() int {
 	return tr.len
 }
 
-// Insert inserts the giving key and value and returns the KV structure.
+// Insert inserts the giving key and value as an Element and return.
 // Returns nil if key already exists.
-func (tr *Tree) Insert(k Key, v Value) KV {
+func (tr *Tree) Insert(k Key, v Value) Element {
 	var n *treeNode
 	p := tr.root
 	for p != nil {
@@ -92,9 +92,9 @@ func (tr *Tree) Insert(k Key, v Value) KV {
 	return n
 }
 
-// Delete removes and returns the KV structure corresponding to the given key.
+// Delete removes and returns the Element of a given key.
 // Returns nil if not found.
-func (tr *Tree) Delete(k Key) KV {
+func (tr *Tree) Delete(k Key) Element {
 	var dd *treeNode
 	d := tr.root
 
@@ -153,9 +153,9 @@ func (tr *Tree) Delete(k Key) KV {
 	return d
 }
 
-// Search returns the KV structure corresponding to the given key.
+// Search returns the Element of a given key.
 // Returns nil if not found.
-func (tr *Tree) Search(k Key) KV {
+func (tr *Tree) Search(k Key) Element {
 	p := tr.root
 	for p != nil {
 		flag := k.Compare(p.key)

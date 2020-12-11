@@ -6,14 +6,14 @@ import (
 	"github.com/Yu-33/gohelper/structs/stack"
 )
 
-// Iterator to get the data for the specified range.
+// Iterator to iteration return element.
 //
-// Range interval: ( start <= x < boundary ).
-// We will return data from the beginning if start is nil,
-// And return data util the end if boundary is nil.
+// The element range is start <= x < boundary.
+// The element will return from the beginning if start is nil,
+// And return until the end if the boundary is nil.
 //
-// The Iterator return data with in-order traversal,
-// And its can used for all-type binary search trees.
+// The Iterator return element with in-order traversal,
+// And it can used with all-type binary search trees.
 //
 // And it is also the implementation of interface container.Iterator
 type Iterator struct {
@@ -42,9 +42,9 @@ func (it *Iterator) Valid() bool {
 	return !it.s.Empty()
 }
 
-// Next returns a k/v pair and moved the iterator to the next pair.
+// Next returns a Element and moved the iterator to the next Element.
 // Returns nil if no more elements.
-func (it *Iterator) Next() KV {
+func (it *Iterator) Next() Element {
 	if it.s.Empty() {
 		return nil
 	}
