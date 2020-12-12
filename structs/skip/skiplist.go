@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/Yu-33/gohelper/structs/container"
+	"github.com/yu31/gohelper/structs/container"
 )
 
 // Type aliases for simplifying use in this package.

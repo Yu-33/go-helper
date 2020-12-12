@@ -3,7 +3,7 @@ package bst
 import (
 	"reflect"
 
-	"github.com/Yu-33/gohelper/structs/stack"
+	"github.com/yu31/gohelper/structs/stack"
 )
 
 // LDR return node by in-order traversal.

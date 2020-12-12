@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Yu-33/gohelper/structs/container"
+	"github.com/yu31/gohelper/structs/container"
 )
 
 func buildBSTree() (tr *Tree) {

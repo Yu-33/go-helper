@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Yu-33/gohelper/structs/container"
+	"github.com/yu31/gohelper/structs/container"
 )
 
 // checkCorrect check every item is less than of equal to the left child and right child.

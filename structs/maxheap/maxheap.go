@@ -1,7 +1,7 @@
 package maxheap
 
 import (
-	"github.com/Yu-33/gohelper/structs/container"
+	"github.com/yu31/gohelper/structs/container"
 )
 
 const (
@@ -152,7 +152,7 @@ func (h *MaxHeap) delete(i int) *Item {
 	h.swap(i, h.len)
 
 	item.index = -1
-	h.items[h.len] = nil // To prevent impact GC.
+	h.items[h.len] = nil // Prevent memory leaks.
 
 	return item
 }

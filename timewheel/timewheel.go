@@ -6,7 +6,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/Yu-33/gohelper/dqueue"
+	"github.com/yu31/gohelper/dqueue"
 )
 
 const (

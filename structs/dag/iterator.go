@@ -1,7 +1,7 @@
 package dag
 
 import (
-	"github.com/Yu-33/gohelper/structs/queue"
+	"github.com/yu31/gohelper/structs/queue"
 )
 
 // IterTopo implements an iterator by Topological Sorting(Kahn Algorithm).
