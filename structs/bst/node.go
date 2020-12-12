@@ -4,6 +4,7 @@ import (
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
+// Type aliases for simplifying use in this package.
 type Key = container.Key
 type Value = container.Value
 type Element = container.Element

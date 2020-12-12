@@ -1,7 +1,6 @@
 package minheap
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -11,19 +10,15 @@ import (
 	"github.com/Yu-33/gohelper/structs/container"
 )
 
-func output(pq *MinHeap) {
-	fmt.Printf("[")
-	for i := 0; i < pq.Len(); i++ {
-		fmt.Printf("%d, ", pq.items[i])
+// checkCorrect check every item is less than of equal to the left child and right child.
+func checkCorrect(t *testing.T, h *MinHeap) {
+	// Check the index.
+	for i := 0; i < h.len; i++ {
+		require.Equal(t, h.items[i].index, i)
 	}
-	fmt.Printf("]\n")
-}
-
-// checkCorrect check every node is less than of equal to the left child and right child
-func checkCorrect(t *testing.T, pq *MinHeap) {
-	for i := 0; i < (pq.len-1)>>1; i++ {
-		require.NotEqual(t, pq.items[i].Compare(pq.items[(i<<1)+1]), 1)
-		require.NotEqual(t, pq.items[i].Compare(pq.items[(i<<1)+2]), 1)
+	for i := 0; i < (h.len-1)>>1; i++ {
+		require.NotEqual(t, h.items[i].key.Compare(h.items[(i<<1)+1].key), 1)
+		require.NotEqual(t, h.items[i].key.Compare(h.items[(i<<1)+2].key), 1)
 	}
 }
 
@@ -41,41 +36,46 @@ func TestNew(t *testing.T) {
 func TestMinHeap(t *testing.T) {
 	r := rand.New(rand.NewSource(time.Now().Unix()))
 
-	max := 33
-	maxKey := max * 10
+	max := 1025
+	maxKey := max * 100
 
 	h := New(max)
 
 	for x := 0; x < 2; x++ {
-		// enqueue and make queue full
+		// enqueue
 		for i := 0; i < max; i++ {
 			k := container.Int64(r.Intn(maxKey) + 1)
 
-			index := h.Push(k)
-			require.Equal(t, h.items[index].(container.Int64), k)
-
-			checkCorrect(t, h)
+			item := h.Push(k, int(k*2+1))
+			require.Equal(t, item.key.(container.Int64), k)
 		}
+
+		checkCorrect(t, h)
+
 		require.False(t, h.Empty())
-		require.Equal(t, h.len, max)
+		require.Equal(t, h.Len(), max)
 
-		// output
-		output(h)
-
-		// dequeue and make queue emtpye
+		// dequeue and make queue empty.
+		p1 := h.Peek()
 		last := h.Pop()
 		require.NotNil(t, last)
+		require.Equal(t, last, p1)
 		for i := 1; i < max; i++ {
+			p1 := h.Peek()
 			item := h.Pop()
 			require.NotNil(t, item)
-			require.NotEqual(t, item.Compare(last), -1)
+			require.Equal(t, item, p1)
 
-			checkCorrect(t, h)
+			require.NotEqual(t, item.key.Compare(last.key), -1)
+			require.Equal(t, item.value, int(item.key.(container.Int64))*2+1)
 
 			last = item
 		}
+
+		checkCorrect(t, h)
+
 		require.True(t, h.Empty())
-		require.Equal(t, h.len, 0)
+		require.Equal(t, h.Len(), 0)
 		require.Nil(t, h.Pop())
 	}
 

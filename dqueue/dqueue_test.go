@@ -15,7 +15,7 @@ func TestNew(t *testing.T) {
 	require.NotNil(t, dq)
 	defer dq.Close()
 
-	require.NotNil(t, dq.C)
+	require.NotNil(t, dq.notifyC)
 	require.NotNil(t, dq.mu)
 	require.NotNil(t, dq.pq)
 	require.Equal(t, dq.pq.Cap(), capacity)

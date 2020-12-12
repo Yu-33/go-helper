@@ -26,15 +26,6 @@ func New(n int) *Stack {
 	return s
 }
 
-func (s *Stack) grow(n int) {
-	if n > s.cap {
-		items := s.items
-		s.cap = n
-		s.items = make([]interface{}, s.cap)
-		copy(s.items, items)
-	}
-}
-
 // Len return the number of elements in the stack.
 func (s *Stack) Len() int {
 	return s.len
@@ -45,12 +36,12 @@ func (s *Stack) Cap() int {
 	return s.cap
 }
 
-// Empty indicates whether the stack is empty.
+// Empty represents whether the stack is empty.
 func (s *Stack) Empty() bool {
 	return s.len == 0
 }
 
-// Push add element to the end of stack.
+// Push adds an element to the end of stack.
 func (s *Stack) Push(item interface{}) {
 	if s.cap == s.len {
 		s.grow(s.cap << 1)
@@ -59,7 +50,7 @@ func (s *Stack) Push(item interface{}) {
 	s.len++
 }
 
-// Pop returns and removes the element that at the end.
+// Pop returns and removes an element that at the end.
 func (s *Stack) Pop() interface{} {
 	if s.Empty() {
 		return nil
@@ -76,4 +67,13 @@ func (s *Stack) Peek() interface{} {
 	}
 	item := s.items[s.len-1]
 	return item
+}
+
+func (s *Stack) grow(n int) {
+	if n > s.cap {
+		items := s.items
+		s.cap = n
+		s.items = make([]interface{}, s.cap)
+		copy(s.items, items)
+	}
 }

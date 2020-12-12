@@ -8,11 +8,36 @@ const (
 	defaultCapacity = 64
 )
 
-type Element = container.Comparator
+// Type aliases for simplifying use in this package.
+type Key = container.Key
+type Value = container.Value
+
+// Item is an item of a MaxHeap.
+type Item struct {
+	key   Key
+	value Value
+	// The index of the item in the heap.
+	index int
+}
+
+// Key returns the key in the item.
+func (item *Item) Key() Key {
+	return item.key
+}
+
+// Value returns the value in the item.
+func (item *Item) Value() Value {
+	return item.value
+}
+
+// Value returns the index of the item.
+func (item *Item) Index() int {
+	return item.index
+}
 
 // MaxHeap implements max heap and can used as priority queue.
 type MaxHeap struct {
-	items []Element
+	items []*Item
 	cap   int
 	len   int
 }
@@ -25,24 +50,11 @@ func Default() *MaxHeap {
 // New creates an MaxHeap with given initialization capacity.
 func New(c int) *MaxHeap {
 	h := &MaxHeap{
-		items: make([]Element, c),
+		items: make([]*Item, c),
 		cap:   c,
 		len:   0,
 	}
 	return h
-}
-
-func (h *MaxHeap) grow(c int) {
-	if c > h.cap {
-		items := h.items
-		h.items = make([]Element, c)
-		h.cap = c
-		copy(h.items, items)
-	}
-}
-
-func (h *MaxHeap) swap(i, j int) {
-	h.items[i], h.items[j] = h.items[j], h.items[i]
 }
 
 // Len return the number of element in the heap.
@@ -55,83 +67,104 @@ func (h *MaxHeap) Cap() int {
 	return h.cap
 }
 
-// Empty indicates whether the heap is empty.
+// Empty represents whether the queue is empty.
 func (h *MaxHeap) Empty() bool {
 	return h.len == 0
 }
 
-// Push add element to the heap, Return the index number of the location.
-func (h *MaxHeap) Push(item Element) int {
+// Push adds an element to the heap, Return the index number of the location.
+func (h *MaxHeap) Push(k Key, v Value) *Item {
 	if h.Len() == h.Cap() {
 		h.grow(h.cap * 2)
 	}
 
+	item := &Item{
+		key:   k,
+		value: v,
+		index: h.len,
+	}
 	h.items[h.len] = item
 
-	var k, p int
-	i := h.len
-
-	for {
-		k = i
-
-		p = (i - 1) >> 1 // parent
-		if p >= 0 && h.items[i].Compare(h.items[p]) == 1 {
-			i = p
-		}
-
-		if k == i {
-			break
-		}
-
-		h.swap(k, i)
-	}
-
+	h.up(h.len)
 	h.len++
-	return i
+
+	return item
 }
 
-// Pop returns and removes the element that at the head.
-func (h *MaxHeap) Pop() Element {
+// Pop returns and removes an element that at the head.
+func (h *MaxHeap) Pop() *Item {
 	if h.Empty() {
 		return nil
 	}
 
 	item := h.items[0]
 	h.len--
+	h.swap(0, h.len)
 
-	h.items[0] = h.items[h.len]
-
-	var i, left, right int
-	k := 0
-
-	for {
-		i = k
-
-		left = (i << 1) + 1
-		if left < h.len && h.items[k].Compare(h.items[left]) == -1 {
-			k = left
-		}
-
-		right = (i << 1) + 2
-		if right < h.len && h.items[k].Compare(h.items[right]) == -1 {
-			k = right
-		}
-
-		if i == k {
-			break
-		}
-
-		h.swap(i, k)
-	}
+	h.down(0, h.len)
 
 	return item
 }
 
 // Peek returns the element that at the head.
-func (h *MaxHeap) Peek() Element {
+func (h *MaxHeap) Peek() *Item {
 	if h.Empty() {
 		return nil
 	}
 
 	return h.items[0]
+}
+
+func (h *MaxHeap) grow(c int) {
+	if c > h.cap {
+		items := h.items
+		h.items = make([]*Item, c)
+		h.cap = c
+		copy(h.items, items)
+	}
+}
+
+func (h *MaxHeap) swap(i, j int) {
+	h.items[i], h.items[j] = h.items[j], h.items[i]
+	h.items[i].index = i
+	h.items[j].index = j
+}
+
+func (h *MaxHeap) compare(i, j int) int {
+	return h.items[i].key.Compare(h.items[j].key)
+}
+
+// up build heap with bottom-up
+func (h *MaxHeap) up(i int) {
+	var p int
+	for {
+		p = (i - 1) >> 1 // parent
+		if p < 0 || i == p || h.compare(i, p) != 1 {
+			break
+		}
+		h.swap(p, i)
+		i = p
+	}
+}
+
+// down build heap with top-down.
+func (h *MaxHeap) down(i int, n int) {
+	for {
+		c := (i << 1) + 1 // left child
+		if c >= n || c < 0 {
+			// after int overflow
+			break
+		}
+
+		if r := c + 1; r < n && h.compare(r, c) == 1 {
+			c = r // right child
+		}
+
+		if h.compare(c, i) != 1 {
+			break
+		}
+
+		h.swap(i, c)
+		i = c
+	}
 }

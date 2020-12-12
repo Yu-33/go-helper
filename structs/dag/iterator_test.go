@@ -86,5 +86,3 @@ func TestDAG_IterTopo(t *testing.T) {
 
 	require.False(t, it.Valid())
 }
-
-

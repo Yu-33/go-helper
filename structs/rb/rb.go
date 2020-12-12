@@ -10,10 +10,10 @@ const (
 	black
 )
 
+// Type aliases for simplifying use in this package.
 type Key = container.Key
 type Value = container.Value
 type Element = container.Element
-
 type Node = bst.Node
 
 // treeNode is used for Red-Black Tree.

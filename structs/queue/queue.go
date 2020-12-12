@@ -30,22 +30,6 @@ func New(c int) *Queue {
 	return q
 }
 
-func (q *Queue) grow(c int) {
-	if c > q.cap-1 {
-		oldCap := q.cap
-		oldLen := q.cap - 1
-		items := q.items
-
-		q.cap = c + 1
-		q.items = make([]interface{}, q.cap)
-		for i := 0; i < oldLen; i++ {
-			q.items[i] = items[(i+q.front)%oldCap]
-		}
-		q.front = 0
-		q.behind = oldLen
-	}
-}
-
 // Len return the number of elements in the queue.
 func (q *Queue) Len() int {
 	return (q.behind - q.front + q.cap) % q.cap
@@ -56,12 +40,12 @@ func (q *Queue) Cap() int {
 	return q.cap - 1
 }
 
-// Empty indicates whether the queue is empty.
+// Empty represents whether the queue is empty.
 func (q *Queue) Empty() bool {
 	return q.Len() == 0
 }
 
-// Push add element to the end of queue.
+// Push adds an element to the end of the queue.
 func (q *Queue) Push(item interface{}) {
 	if q.Len() == q.Cap() {
 		q.grow((q.cap - 1) * 2)
@@ -70,7 +54,7 @@ func (q *Queue) Push(item interface{}) {
 	q.behind = (q.behind + 1) % q.cap
 }
 
-// Pop returns and removes the element that at the head.
+// Pop returns and removes an element that at the head.
 func (q *Queue) Pop() interface{} {
 	if q.Empty() {
 		return nil
@@ -86,4 +70,20 @@ func (q *Queue) Peek() interface{} {
 		return nil
 	}
 	return q.items[q.front]
+}
+
+func (q *Queue) grow(c int) {
+	if c > q.cap-1 {
+		oldCap := q.cap
+		oldLen := q.cap - 1
+		items := q.items
+
+		q.cap = c + 1
+		q.items = make([]interface{}, q.cap)
+		for i := 0; i < oldLen; i++ {
+			q.items[i] = items[(i+q.front)%oldCap]
+		}
+		q.front = 0
+		q.behind = oldLen
+	}
 }
