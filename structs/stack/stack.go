@@ -57,6 +57,7 @@ func (s *Stack) Pop() interface{} {
 	}
 	s.len--
 	item := s.items[s.len]
+	s.items[s.len] = nil // To prevent impact GC.
 	return item
 }
 

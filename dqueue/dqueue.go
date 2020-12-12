@@ -96,10 +96,11 @@ func (dq *DQueue) Expire(exp int64, value Value) {
 func (dq *DQueue) offer(exp int64, value Value) {
 	dq.mu.Lock()
 	item := dq.pq.Push(Int64(exp), value)
+	index := item.Index()
 	dq.mu.Unlock()
 
 	// A new item with the earliest expiration is added.
-	if item.Index() == 0 && atomic.CompareAndSwapInt32(&dq.sleeping, 1, 0) {
+	if index == 0 && atomic.CompareAndSwapInt32(&dq.sleeping, 1, 0) {
 		dq.wakeupC <- struct{}{}
 	}
 }

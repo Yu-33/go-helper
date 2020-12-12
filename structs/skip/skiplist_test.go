@@ -134,8 +134,6 @@ func TestList_Search(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-
 	sl := New()
 
 	length := 257
@@ -143,6 +141,7 @@ func TestList(t *testing.T) {
 	keys := make([]container.Int64, length)
 
 	for x := 0; x < 2; x++ {
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		// insert
 		for i := 0; i < length; i++ {
 			for {

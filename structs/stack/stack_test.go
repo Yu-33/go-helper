@@ -19,24 +19,26 @@ func TestStackNew(t *testing.T) {
 	require.Equal(t, st.cap, capacity)
 }
 
-func TestStack1(t *testing.T) {
-	capacity := 17
-	st := New(capacity)
+func TestStack(t *testing.T) {
+	st := Default()
+	capacity := 1025
 
 	for x := 0; x < 2; x++ {
 		// test push and make stack full
 		for i := 0; i < capacity; i++ {
 			st.Push(i)
 		}
+		require.Equal(t, st.len, capacity)
 		require.Equal(t, st.Len(), capacity)
 		require.False(t, st.Empty())
-		require.Equal(t, st.len, capacity)
 
 		// test pop and make stack empty
 		for i := capacity - 1; i >= 0; i-- {
 			v := st.Pop()
 			require.NotNil(t, v)
 			require.Equal(t, v, i)
+
+			require.Nil(t, st.items[st.len])
 		}
 
 		require.True(t, st.Empty())
@@ -46,7 +48,7 @@ func TestStack1(t *testing.T) {
 	}
 }
 
-func TestStack2(t *testing.T) {
+func TestStack_Auto_Cap(t *testing.T) {
 	capacity := 2
 	st := New(capacity)
 

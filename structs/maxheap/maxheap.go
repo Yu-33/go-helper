@@ -87,26 +87,38 @@ func (h *MaxHeap) Push(k Key, v Value) *Item {
 
 	h.up(h.len)
 	h.len++
+	return item
+}
 
+// Remove removes and returns the item at index i from the heap.
+// The complexity is O(log n) where n = h.Len().
+// Return nil if the i >= h.Len().
+func (h *MaxHeap) Remove(i int) *Item {
+	if i >= h.Len() {
+		return nil
+	}
+	item := h.delete(i)
+	if i != h.len {
+		if !h.down(i, h.len) {
+			h.up(i)
+		}
+	}
 	return item
 }
 
 // Pop returns and removes an element that at the head.
+// Return nil if the heap is empty.
 func (h *MaxHeap) Pop() *Item {
 	if h.Empty() {
 		return nil
 	}
-
-	item := h.items[0]
-	h.len--
-	h.swap(0, h.len)
-
-	h.down(0, h.len)
-
+	item := h.delete(0)
+	_ = h.down(0, h.len)
 	return item
 }
 
 // Peek returns the element that at the head.
+// Return nil if the heap is empty.
 func (h *MaxHeap) Peek() *Item {
 	if h.Empty() {
 		return nil
@@ -134,6 +146,17 @@ func (h *MaxHeap) compare(i, j int) int {
 	return h.items[i].key.Compare(h.items[j].key)
 }
 
+func (h *MaxHeap) delete(i int) *Item {
+	item := h.items[i]
+	h.len--
+	h.swap(i, h.len)
+
+	item.index = -1
+	h.items[h.len] = nil // To prevent impact GC.
+
+	return item
+}
+
 // up build heap with bottom-up
 func (h *MaxHeap) up(i int) {
 	var p int
@@ -148,7 +171,8 @@ func (h *MaxHeap) up(i int) {
 }
 
 // down build heap with top-down.
-func (h *MaxHeap) down(i int, n int) {
+func (h *MaxHeap) down(i0 int, n int) bool {
+	i := i0
 	for {
 		c := (i << 1) + 1 // left child
 		if c >= n || c < 0 {
@@ -167,4 +191,5 @@ func (h *MaxHeap) down(i int, n int) {
 		h.swap(i, c)
 		i = c
 	}
+	return i > i0
 }

@@ -168,8 +168,6 @@ func TestTree_Len(t *testing.T) {
 }
 
 func TestTree(t *testing.T) {
-	r := rand.New(rand.NewSource(time.Now().Unix()))
-
 	tr := New()
 
 	length := 257
@@ -177,6 +175,7 @@ func TestTree(t *testing.T) {
 	keys := make([]container.Int, length)
 
 	for x := 0; x < 2; x++ {
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		// insert
 		for i := 0; i < length; i++ {
 			for {

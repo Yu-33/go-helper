@@ -60,6 +60,7 @@ func (q *Queue) Pop() interface{} {
 		return nil
 	}
 	item := q.items[q.front]
+	q.items[q.front] = nil // To prevent impact GC.
 	q.front = (q.front + 1) % q.cap
 	return item
 }

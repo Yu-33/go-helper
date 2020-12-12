@@ -25,8 +25,8 @@ func TestQueueNew(t *testing.T) {
 }
 
 func TestQueue1(t *testing.T) {
-	capacity := 17
-	q := New(capacity)
+	capacity := 1025
+	q := Default()
 
 	// test enqueue and make length of queue equal of capacity
 	for i := 0; i < capacity; i++ {
@@ -38,13 +38,14 @@ func TestQueue1(t *testing.T) {
 	require.Equal(t, q.behind, capacity)
 
 	require.Equal(t, q.Len(), capacity)
-	require.Equal(t, q.Cap(), capacity)
 
 	// test dequeue and make queue empty
 	for i := 0; i < capacity; i++ {
 		item := q.Pop()
 		require.NotNil(t, item)
 		require.Equal(t, item, i)
+
+		require.Nil(t, q.items[(q.front-1)%q.cap])
 	}
 
 	// queue is empty
@@ -53,7 +54,6 @@ func TestQueue1(t *testing.T) {
 
 	require.True(t, q.Empty())
 	require.Equal(t, q.Len(), 0)
-	require.Equal(t, q.Cap(), capacity)
 	require.Nil(t, q.Pop())
 }
 
