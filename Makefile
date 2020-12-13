@@ -10,6 +10,7 @@ help:
 	@echo "  lint    to run the staticcheck"
 	@echo "  check   to format, vet, lint"
 	@echo "  test    to run test case"
+	@echo "  bench   to run benchmark test case"
 	@exit 0
 
 .PHONY: format
@@ -31,6 +32,10 @@ check: format vet lint
 .PHONY: test
 test:
 	@[[ ${VERBOSE} = "yes" ]] && set -x; go test -race -v -test.count=1 -failfast ./...;
+
+.PHONY: bench
+bench:
+	@[[ ${VERBOSE} = "yes" ]] && set -x; go test -test.bench="." -test.run="Benchmark" -benchmem -count=1 ./...;
 
 .DEFAULT_GOAL = help
 
